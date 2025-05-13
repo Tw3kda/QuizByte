@@ -1,17 +1,23 @@
-import Constants from "expo-constants";
-import { initializeApp } from "firebase/app";
-import { getAuth } from "firebase/auth";
-import { getFirestore } from "firebase/firestore";
+import { initializeApp } from 'firebase/app';
+import { getAuth } from 'firebase/auth';
+import { getFirestore } from 'firebase/firestore';
 
-const {firebaseApiKey,firebaseAuthDomain,firebaseProjectId,firebaseStorageBucket,firebaseMessagingSenderId,firebaseAppId} = Constants.expoConfig?.extra || {};
+import {
+  FIREBASE_API_KEY,
+  FIREBASE_APP_ID,
+  FIREBASE_AUTH_DOMAIN,
+  FIREBASE_MESSAGING_SENDER_ID,
+  FIREBASE_PROJECT_ID,
+  FIREBASE_STORAGE_BUCKET,
+} from '@env';
 
 const firebaseConfig = {
-  apiKey: "AIzaSyAQwlnGr62eh_dui8wlIjgLYGR4hwXgQz0",
-  authDomain: "quizbyte-nico-santi.firebaseapp.com",
-  projectId: "quizbyte-nico-santi",
-  storageBucket: "quizbyte-nico-santi.firebasestorage.app",
-  messagingSenderId: "169267267554",
-  appId: "1:169267267554:web:1476fa991cd686029d1bbb"
+  apiKey: FIREBASE_API_KEY,
+  authDomain: FIREBASE_AUTH_DOMAIN,
+  projectId: FIREBASE_PROJECT_ID,
+  storageBucket: FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: FIREBASE_MESSAGING_SENDER_ID,
+  appId: FIREBASE_APP_ID,
 };
 
 export const app = initializeApp(firebaseConfig);
