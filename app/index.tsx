@@ -1,5 +1,8 @@
+import BlackButton from '@/components/blackButton';
+import BlackButton2 from '@/components/blackButton2';
 import { useFonts } from 'expo-font';
-import { Text, View } from 'react-native';
+import { router } from 'expo-router';
+import { Image, View } from 'react-native';
 
 export default function App() {
   const [fontsLoaded] = useFonts({
@@ -11,10 +14,16 @@ export default function App() {
   }
 
   return (
-    <View>
-      <Text style={{ fontFamily: 'PressStart2P-Regular' }}>
-        ¡Pixelpower activado!
-      </Text>
+    <View style={{ flex: 1, backgroundColor: "#111721", justifyContent: 'center', alignItems: 'center', gap: 20 }}>
+      <Image
+        source={require('../assets/images/QuizByte-Logo.png')}
+        style={{ width: 337, height: 337 }}
+        resizeMode="contain">
+      </Image>
+
+      <BlackButton2 title="Registrar" onPress={() => router.push('/(auth)/SignUp')} />
+
+      <BlackButton title="Iniciar Sesión" onPress={() => router.push('/(auth)/LogIn')} />
     </View>
   );
 }

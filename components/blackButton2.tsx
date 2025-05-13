@@ -8,12 +8,12 @@ interface Props {
   children?: React.ReactNode;
 }
 
-const BlackButton = ({ title, onPress }: Props) => {
+const BlackButton2 = ({ title, onPress }: Props) => {
   return (
-    <Pressable style={styles.blackButton} onPress={onPress}>
+    <Pressable style={styles.blackButton2} onPress={onPress}>
       <Text style={styles.blackButtonText}>{title}</Text>
     </Pressable>
   );
 };
 
-export default BlackButton;
+export default BlackButton2;
