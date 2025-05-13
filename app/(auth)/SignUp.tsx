@@ -1,13 +1,25 @@
-import React, { useState } from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import BlackButton2 from '../../components/blackButton2';
+import { useRouter } from 'expo-router';
+import React, { useContext, useState } from 'react';
+import { Alert, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import BlackButton from '../../components/blackButton';
 import TextInput from '../../components/textInput';
 import colors from '../../constants/Colors';
+import { AuthContext } from '../../contexts/AuthContext'; // Ajusta el path si es necesario
 
 export default function SignUpScreen() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const router = useRouter();
+  const authContext = useContext(AuthContext);
+
+  const handleSignUp = async () => {
+    if (!authContext) return;
+    const user = await authContext.register(email, password, name);
+    if (!user) {
+      Alert.alert("Error", "No se pudo registrar el usuario");
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -37,13 +49,14 @@ export default function SignUpScreen() {
         />
       </View>
 
-      <BlackButton2
+      <BlackButton
         title="Registrarse"
-        onPress={() => console.log('Sign Up!')}
+        color={colors.orange}
+        onPress={handleSignUp}
       />
 
-      <TouchableOpacity>
-        <Text style={styles.link}>¿No tienes cuenta? Regístrate</Text>
+      <TouchableOpacity onPress={() => router.push('/LogIn')}>
+        <Text style={styles.link}>¿Ya tienes una cuenta? Inicia sesión</Text>
       </TouchableOpacity>
     </View>
   );

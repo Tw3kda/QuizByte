@@ -1,17 +1,31 @@
 import React from 'react';
 import { Pressable, Text } from 'react-native';
-import { styles } from '../styles/buttons';
+import { styles as baseStyles } from '../styles/buttons';
 
 interface Props {
   title: string;
   onPress: () => void;
-  children?: React.ReactNode;
+  color?: string; // color de fondo
+  textColor?: string; // color del texto
 }
 
-const BlackButton = ({ title, onPress }: Props) => {
+const BlackButton = ({ title, onPress, color, textColor }: Props) => {
   return (
-    <Pressable style={styles.blackButton} onPress={onPress}>
-      <Text style={styles.blackButtonText}>{title}</Text>
+    <Pressable
+      style={[
+        baseStyles.blackButton,
+        color && { backgroundColor: color }, // aplica color de fondo si se pasa
+      ]}
+      onPress={onPress}
+    >
+      <Text
+        style={[
+          baseStyles.blackButtonText,
+          textColor && { color: textColor }, // aplica color del texto si se pasa
+        ]}
+      >
+        {title}
+      </Text>
     </Pressable>
   );
 };

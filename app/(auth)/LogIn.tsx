@@ -1,12 +1,24 @@
-import React, { useState } from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { useRouter } from 'expo-router';
+import React, { useContext, useState } from 'react';
+import { Alert, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import BlackButton from '../../components/blackButton';
 import TextInput from '../../components/textInput';
 import colors from '../../constants/Colors';
+import { AuthContext } from '../../contexts/AuthContext'; // Ajusta el path si es necesario
 
 export default function LoginScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const router = useRouter();
+  const authContext = useContext(AuthContext);
+
+  const handleLogin = async () => {
+    if (!authContext) return;
+    const success = await authContext.login(email, password);
+    if (!success) {
+      Alert.alert("Error", "Correo o contraseña incorrectos");
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -33,10 +45,11 @@ export default function LoginScreen() {
 
       <BlackButton
         title="Iniciar Sesión"
-        onPress={() => console.log('Login!')}
+        color={colors.purple}
+        onPress={handleLogin}
       />
 
-      <TouchableOpacity>
+      <TouchableOpacity onPress={() => router.push('/SignUp')}>
         <Text style={styles.link}>¿No tienes cuenta? Regístrate</Text>
       </TouchableOpacity>
     </View>
