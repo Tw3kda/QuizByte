@@ -1,3 +1,4 @@
+import { useNavigation } from '@react-navigation/native';
 import { useRouter } from 'expo-router';
 import { getAuth } from 'firebase/auth';
 import { doc, getDoc, getFirestore } from 'firebase/firestore';
@@ -10,6 +11,8 @@ import fonts from '../../../constants/fonts';
 export default function HomeScreen() {
   const [userName, setUserName] = useState('Cargando...');
   const router = useRouter();
+  const navigation = useNavigation();
+
 
   useEffect(() => {
     const fetchUserName = async () => {
@@ -45,8 +48,8 @@ export default function HomeScreen() {
         imageStyle={styles.imageStyle}
       />
       <ScrollView contentContainerStyle={styles.scrollContent}>
-        <Text style={styles.title}>Bienvenido {userName}</Text>
-
+          <Text style={styles.title}>Bienvenido {userName}</Text>
+          
         <WhiteButton
           title='¡Jugar Trivia!'
           color={colors.green}
@@ -105,5 +108,16 @@ const styles = StyleSheet.create({
     fontSize: 17,
     color: '#fff',
     marginBottom: 70,
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 15,
+    marginBottom: 70,
+  },
+  menuIcon: {
+    fontSize: 24,
+    color: '#fff',
+    paddingHorizontal: 10,
   },
 });
