@@ -45,7 +45,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       const userDoc = await getDoc(doc(db, "users", firebaseUser.uid));
       if (userDoc.exists()) {
         setUserData(userDoc.data() as UserData);
-        router.push("/(app)/home/HomeScreen");
+        router.push("/(app)/(drawer)/Index");
       }
 
       return true;
@@ -73,7 +73,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       await setDoc(doc(db, "users", firebaseUser.uid), newUserData);
       setUserData(newUserData);
 
-      router.push("/(app)/(addGame)/Index");
+      router.push("/(app)/(drawer)/Index");
       return firebaseUser;
     } catch (error) {
       console.error("🔥 Error al registrar usuario:", error);

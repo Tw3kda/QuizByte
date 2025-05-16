@@ -30,7 +30,7 @@ export default function LoginScreen() {
         <Text style={styles.label}>Email</Text>
         <TextInput
           placeholder="Ingrese su Email"
-          value={email}
+          value={email} 
           onChangeText={setEmail}
         />
 
