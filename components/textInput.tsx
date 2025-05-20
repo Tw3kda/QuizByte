@@ -34,8 +34,8 @@ const TextInputComponent = ({
       style={[
         styles.inputContainer,
         color && { backgroundColor: color },
-        width && { width },
-        height && { height },
+        width != null ? { width } : undefined,
+        height != null ? { height } : undefined,
         containerStyle,
       ]}
     >
