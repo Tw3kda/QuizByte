@@ -31,6 +31,8 @@ import { AuthContext } from '../../contexts/AuthContext'; // Ajusta el path si e
             placeholder="Ingrese su Nombre"
             value={name}
             onChangeText={setName}
+            width={278}
+            height={55}
           />
 
           <Text style={styles.label}>Email</Text>
@@ -38,6 +40,8 @@ import { AuthContext } from '../../contexts/AuthContext'; // Ajusta el path si e
             placeholder="Ingrese su Email"
             value={email}
             onChangeText={setEmail}
+            width={278}
+            height={55}
           />
 
           <Text style={styles.label}>Contraseña</Text>
@@ -46,6 +50,8 @@ import { AuthContext } from '../../contexts/AuthContext'; // Ajusta el path si e
             value={password}
             onChangeText={setPassword}
             secureTextEntry
+            width={278}
+            height={55}
           />
         </View>
 

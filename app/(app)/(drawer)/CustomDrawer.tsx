@@ -62,7 +62,7 @@ const [userName, setUserName] = useState('Cargando...');
               styles.item,
               pressed && { opacity: 0.6 },
             ]}
-            onPress={() => router.push(item.route)}
+            onPress={() => router.push(item.route as any)}
           >
             <Image source={item.icon} style={styles.icon} />
             <Text style={styles.label}>{item.label}</Text>

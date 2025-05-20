@@ -32,6 +32,8 @@ export default function LoginScreen() {
           placeholder="Ingrese su Email"
           value={email} 
           onChangeText={setEmail}
+          width={278}
+          height={55}
         />
 
         <Text style={styles.label}>Contraseña</Text>
@@ -40,6 +42,8 @@ export default function LoginScreen() {
           value={password}
           onChangeText={setPassword}
           secureTextEntry
+          width={278}
+          height={55}
         />
       </View>
 
