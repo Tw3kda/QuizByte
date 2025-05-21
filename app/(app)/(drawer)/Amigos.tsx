@@ -87,6 +87,11 @@ export default function Amigos() {
         </View>
         {/* Aquí vendría el dropdown personalizado después */}
 
+        {/* Aquí iría la lista de amigos, que sera renderizada dependiendo de la cantidad de amigos que tenga el usuario iniciado */}
+        {/* FriendCardComponent */}
+        {/* Aquí iría la lista de solicitudes de amistad */}
+        {/* FriendRequestCardComponent */}
+
         {/* Botón de regresar */}
         <BackButton onPress={() => router.back()} />
       </ScrollView>

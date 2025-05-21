@@ -41,50 +41,52 @@ export default function Index() {
   }, []);
 
   return (
-    <View style={styles.container}>
-      <ImageBackground
-        source={require('../../../assets/images/BackgroundLobby.png')}
-        style={styles.backgroundImage}
-        imageStyle={styles.imageStyle}
+  <View style={styles.container}>
+    <ImageBackground
+      source={require('../../../assets/images/BackgroundLobby.png')}
+      style={styles.backgroundImage}
+      imageStyle={styles.imageStyle}
+    />
+
+    {/* Header separado del scroll */}
+    <View style={styles.header}>
+      <Pressable onPress={() => navigation.openDrawer()} style={styles.menuButton}>
+        <Text style={styles.menuIcon}>☰</Text>
+      </Pressable>
+      <View style={styles.titleContainer}>
+        <Text style={styles.title}>Bienvenido {userName}</Text>
+      </View>
+    </View>
+
+    <ScrollView contentContainerStyle={styles.scrollContent}>
+
+      <WhiteButton
+        title="¡Jugar Trivia!"
+        color={colors.green}
+        onPress={() => router.push('/(app)/(game)/GameScreen')}
       />
 
-      <ScrollView contentContainerStyle={styles.scrollContent}>
+      <WhiteButton
+        title="Crear Lobby Privado"
+        color={colors.purple}
+        onPress={() => router.push('/(app)/(privateLobby)/Index')}
+      />
 
-        <View style={styles.header}>
-          <Pressable onPress={() => navigation.openDrawer()} style={styles.menuButton}>
-            <Text style={styles.menuIcon}>☰</Text>
-          </Pressable>
-          <View style={styles.titleContainer}>
-            <Text style={styles.title}>Bienvenido {userName}</Text>
-          </View>
-        </View>
+      <WhiteButton
+        title="Unirse a Lobby"
+        color={colors.orange}
+        onPress={() => router.push('/(app)/(privateLobby)/JoinedLobby')}
+      />
 
-        <WhiteButton
-          title="¡Jugar Trivia!"
-          color={colors.green}
-          onPress={() => router.push('/(app)/(game)/GameScreen')}
-        />
+      <WhiteButton
+        title="Agregar Fandoms"
+        color={colors.pink}
+        onPress={() => router.push('/(app)/(addGame)/Index')}
+      />
+    </ScrollView>
+  </View>
+);
 
-        <WhiteButton
-          title="Crear Lobby Privado"
-          color={colors.purple}
-          onPress={() => router.push('/(app)/(privateLobby)/Index')}
-        />
-
-        <WhiteButton
-          title="Unirse a Lobby"
-          color={colors.orange}
-          onPress={() => router.push('/(app)/(privateLobby)/JoinedLobby')}
-        />
-
-        <WhiteButton
-          title="Agregar Fandoms"
-          color={colors.pink}
-          onPress={() => router.push('/(app)/(addGame)/Index')}
-        />
-      </ScrollView>
-    </View>
-  );
 }
 
 const styles = StyleSheet.create({
@@ -106,20 +108,20 @@ const styles = StyleSheet.create({
     height: '100%',
   },
   scrollContent: {
-    flexGrow: 1,
-    alignItems: 'center',
-    paddingTop: 80, // Aumentamos el padding superior (ajusta el valor según necesites)
-    paddingBottom: 40,
-    paddingHorizontal: 20,
-    gap: 20,
+  flexGrow: 1,
+  justifyContent: 'center', // Centrado vertical
+  alignItems: 'center',     // Centrado horizontal
+  paddingHorizontal: 20,
+  gap: 20,
   },
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: 60, // Aumentamos el margen inferior (ajusta el valor según necesites)
-    paddingHorizontal: 20,
-    width: '100%',
+  flexDirection: 'row',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  paddingHorizontal: 20,
+  paddingTop: 60,
+  marginBottom: 20,
+  width: '100%',
   },
   menuButton: {
     padding: 10, // Añadimos un poco de padding al botón del menú para que sea más fácil de tocar

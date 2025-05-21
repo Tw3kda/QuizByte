@@ -1,7 +1,6 @@
 import colors from '@/constants/Colors';
 import { DrawerNavigationProp } from '@react-navigation/drawer';
 import { useNavigation } from '@react-navigation/native';
-import { useRouter } from 'expo-router';
 import { getAuth } from 'firebase/auth';
 import { doc, getDoc, getFirestore } from 'firebase/firestore';
 import React, { useEffect, useState } from 'react';
@@ -10,7 +9,7 @@ import fonts from '../../../constants/fonts';
 
 export default function Index() {
   const [userName, setUserName] = useState('Cargando...');
-  const router = useRouter();
+  const [stats, setStats] = useState<number[]>([0, 0, 0]);
   const navigation = useNavigation<DrawerNavigationProp<{}>>();
 
   useEffect(() => {
@@ -27,11 +26,16 @@ export default function Index() {
         if (userSnap.exists()) {
           const userData = userSnap.data();
           setUserName(userData.name || 'Jugador');
+
+          const puntaje = userData.stats[0] || 0;
+          const trivias = userData.stats[1] || 0;
+          const ranking = userData.stats[2] || 0;
+          setStats([puntaje, trivias, ranking]);
         } else {
           setUserName('Jugador');
         }
       } catch (error) {
-        console.error('Error obteniendo el nombre:', error);
+        console.error('Error obteniendo el nombre y sus datos', error);
         setUserName('Jugador');
       }
     };
@@ -60,13 +64,13 @@ export default function Index() {
           </View>
 
           <Text style={styles.statLabel}>Puntaje Total</Text>
-          <Text style={styles.statValue}>120540</Text>
+          <Text style={styles.statValue}>{stats[0]}</Text>
 
           <Text style={styles.statLabel}>Trivias Jugadas</Text>
-          <Text style={styles.statValue}>12</Text>
+          <Text style={styles.statValue}>{stats[1]}</Text>
 
           <Text style={styles.statLabel}>Ranking Actual</Text>
-          <Text style={styles.statValue}>150</Text>
+          <Text style={styles.statValue}>{stats[2]}</Text>
         </View>
 
         <View style={styles.sagasContainer}>
@@ -90,22 +94,22 @@ const styles = StyleSheet.create({
   scrollContent: {
     flexGrow: 1,
     alignItems: 'center',
-    paddingTop: 40, // Reducimos un poco el padding superior
+    paddingTop: 40,
     paddingBottom: 40,
     paddingHorizontal: 20,
-    gap: 25, // Aumentamos un poco el espacio entre contenedores
+    gap: 25,
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: 40, // Reducimos el margen inferior
+    marginBottom: 40,
     paddingHorizontal: 20,
     width: '100%',
   },
   menuButton: {
     paddingVertical: 10,
-    paddingRight: 15, // Ajustamos el padding para estar más pegado al borde izquierdo
+    paddingRight: 15,
   },
   menuIcon: {
     fontSize: 22,
@@ -129,10 +133,9 @@ const styles = StyleSheet.create({
   },
   statsContainer: {
     backgroundColor: colors.grayDark,
-    padding: 25, // Aumentamos el padding
+    padding: 25,
     width: '100%',
-    borderRadius: 10, // Añadimos bordes redondeados
-    gap: 18, // Aumentamos el espacio entre elementos
+    gap: 18,
   },
   statLabel: {
     fontFamily: fonts.pressStart2P,
@@ -146,13 +149,12 @@ const styles = StyleSheet.create({
   },
   sagasContainer: {
     backgroundColor: colors.grayDark,
-    padding: 25, // Aumentamos el padding
+    padding: 25,
     width: '100%',
-    borderRadius: 10, // Añadimos bordes redondeados
   },
   sagasText: {
     fontFamily: fonts.pressStart2P,
-    color: '#D1D5DB', // Un tono de gris más claro
+    color: '#D1D5DB',
     fontSize: 13,
     marginTop: 12,
   },
@@ -160,16 +162,16 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 10,
-    marginBottom: 15, // Reducimos un poco el margen inferior
+    marginBottom: 15,
   },
   sectionTitleStats: {
     fontFamily: fonts.pressStart2P,
-    color: '#6366F1', // Color del encabezado de estadísticas
+    color: '#6366F1',
     fontSize: 16,
   },
   sectionTitleSagas: {
     fontFamily: fonts.pressStart2P,
-    color: colors.pink, // Un tono de morado/rosa para Sagas Favoritas (ajústalo si tienes un color específico)
+    color: colors.pink,
     fontSize: 16,
   },
   sectionIcon: {

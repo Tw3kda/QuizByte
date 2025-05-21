@@ -1,10 +1,7 @@
-import React from 'react'
-import { Text, View } from 'react-native'
+import { Redirect } from 'expo-router'
 
 export default function CerrarSesion() {
   return (
-    <View>
-      <Text>CerrarSesion</Text>
-    </View>
+    Redirect ({ href: '/' }) // Redirige a la pantalla de inicio de sesión
   )
 }
