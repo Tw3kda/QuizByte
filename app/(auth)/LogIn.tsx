@@ -32,6 +32,7 @@ export default function LoginScreen() {
           placeholder="Ingrese su Email"
           value={email} 
           onChangeText={setEmail}
+          
         />
 
         <Text style={styles.label}>Contraseña</Text>

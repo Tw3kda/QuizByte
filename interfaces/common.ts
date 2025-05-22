@@ -16,3 +16,8 @@ export interface UserData {
   friends: Record<string, Friend>;
   stats: [number, number, number]; // [score, games, rank]
 }
+
+export interface FandomItem {
+  name: string;
+  imageUrl: string;
+}
