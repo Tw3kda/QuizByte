@@ -14,11 +14,12 @@ import { ScrollView } from "react-native-gesture-handler";
 import colors from "../../../constants/Colors";
 import { useFandom } from "../../../contexts/FandomContext"; // 👈 import the hook
 
-const router = useRouter();
 
 export default function SearchScreen() {
   const { results, isLoading, error, fetchFandoms, clearResults } = useFandom();
   const [searchTerm, setSearchTerm] = useState("");
+  const router = useRouter();
+
 
   const handlePress = (item: { name: string; imageUrl: string }) => {
     setSearchTerm("");
