@@ -12,7 +12,7 @@ import fonts from '../../../constants/fonts';
 export default function Index() {
   const [userName, setUserName] = useState('Cargando...');
   const router = useRouter();
-  const navigation = useNavigation<DrawerNavigationProp<{}>>(); // Drawer navigation pa' abrir el menú
+  const navigation = useNavigation<DrawerNavigationProp<{}>>();
 
   useEffect(() => {
     const fetchUserName = async () => {

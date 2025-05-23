@@ -1,4 +1,5 @@
 import { useFonts } from "expo-font";
+import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
   Image,
@@ -6,19 +7,34 @@ import {
   StyleSheet,
   Text,
   TextInput,
+  TouchableOpacity,
   View,
 } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 import colors from "../../../constants/Colors";
 import { useFandom } from "../../../contexts/FandomContext"; // 👈 import the hook
 
+const router = useRouter();
+
 export default function SearchScreen() {
+  const { results, isLoading, error, fetchFandoms, clearResults } = useFandom();
+  const [searchTerm, setSearchTerm] = useState("");
+
+  const handlePress = (item: { name: string; imageUrl: string }) => {
+    setSearchTerm("");
+    clearResults();
+    router.push({
+      pathname: "/confirm",
+      params: {
+        titulo: item.name,
+        url: item.imageUrl ?? "",
+      },
+    });
+  };
+
   const [fontsLoaded] = useFonts({
     "PressStart2P-Regular": require("../../../assets/fonts/PressStart2P-Regular.ttf"),
   });
-
-  const { results, isLoading, error, fetchFandoms } = useFandom(); // 👈 use the context
-  const [searchTerm, setSearchTerm] = useState("");
 
   const handleSearch = () => {
     if (searchTerm.trim()) {
@@ -26,12 +42,29 @@ export default function SearchScreen() {
     }
   };
 
+  const handleCamera = () => {
+    router.push({
+  pathname: "/camera",
+  params: { from: "search" },
+});
+  };
+
   if (!fontsLoaded) return null;
 
   return (
+
+    
     <View style={styles.container}>
+
       <View style={styles.containerTitle}>
-        <Text style={styles.title}>Agregar juego o película</Text>
+        <TouchableOpacity onPress={()=>router.push("/Index")}>
+                  <Image
+                    source={require("../../../assets/images/Back.png")}
+                    style={styles.backButton}
+                  />
+        </TouchableOpacity>
+                
+        <Text style={styles.title}>Agregar fandom</Text>
       </View>
 
       <View style={styles.manualSearchContainer}>
@@ -58,7 +91,7 @@ export default function SearchScreen() {
         <ScrollView>
           <View style={styles.containerResult}>
             {results.map((item, index) => (
-              <Pressable key={index}>
+              <Pressable key={index} onPress={() => handlePress(item)}>
                 <View style={styles.cardContainer}>
                   {item.imageUrl ? (
                     <Image
@@ -84,13 +117,17 @@ export default function SearchScreen() {
       </View>
 
       <View style={styles.photoSearchContainer}>
-        <Text style={styles.secondTitle}>Búsqueda por imagen</Text>
-        <View style={[styles.purple]}>
-          <Image
-            source={require("../../../assets/images/Camera.png")}
-            style={{ width: 80, height: 80 , marginTop:10}}
-          />
-        </View>
+       
+          <Text style={styles.secondTitle}>Búsqueda por imagen</Text>
+          <View style={[styles.purple]}>
+             <Pressable onPress={() => handleCamera()}>
+            <Image
+              source={require("../../../assets/images/Camera.png")}
+              style={{ width: 80, height: 80, marginTop: 10 }}
+            />
+               </Pressable>
+          </View>
+     
       </View>
     </View>
   );
@@ -104,16 +141,34 @@ const styles = StyleSheet.create({
     paddingTop: 40,
     alignItems: "center",
   },
+  titleContainer: {
+    flexDirection: "row", // 🔹 ordena hijos horizontalmente
+    justifyContent: "flex-start", // opcional: distribuye el espacio
+    alignItems: "center", // opcional: alinea verticalmente
+    marginVertical: 20,
+  },
   title: {
     fontFamily: "PressStart2P-Regular",
     color: colors.white,
     textAlign: "center",
     fontSize: 24,
+    width:"70%"
   },
-  containerTitle: {
-    width: "65%",
-    paddingBottom: 25,
-  },
+containerTitle: {
+  width: "100%",
+  flexDirection: "row",
+  alignItems: "center",
+  justifyContent: "center", // centramos el contenido horizontalmente
+  position: "relative", // necesario para posicionar el botón back
+  marginVertical: 20,
+  paddingBottom: 5,
+},
+backButton: {
+  position: "absolute",
+  left: -50,
+  top: 0,
+},
+  containerContainer:{},
   secondTitle: {
     fontFamily: "PressStart2P-Regular",
     color: colors.orange,
@@ -127,7 +182,7 @@ const styles = StyleSheet.create({
     height: "55%",
     alignItems: "center",
     paddingBottom: 20,
-    marginBottom: 30,
+    marginBottom: 15,
   },
   input: {
     width: "75%",
@@ -214,7 +269,7 @@ const styles = StyleSheet.create({
     width: 100,
     height: 100,
     backgroundColor: colors.purple,
-    alignItems: 'center'
+    alignItems: "center",
   },
   button: {},
 });

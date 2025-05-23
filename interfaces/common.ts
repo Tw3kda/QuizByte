@@ -21,3 +21,13 @@ export interface FandomItem {
   name: string;
   imageUrl: string;
 }
+
+export interface GeminiRequest {
+  prompt: string;
+  imageBase64?: string;
+}
+
+export interface GeminiResponse {
+  text: string;
+  finishReason?: string;
+}

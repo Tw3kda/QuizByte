@@ -8,6 +8,7 @@ interface FandomContextType {
   isLoading: boolean;
   error: string | null;
   fetchFandoms: (searchTerm: string) => Promise<void>;
+  clearResults: () => void;
 }
 
 export const FandomProvider: React.FC<{ children: React.ReactNode }> = ({
@@ -22,7 +23,7 @@ export const FandomProvider: React.FC<{ children: React.ReactNode }> = ({
     setError(null);
 
     try {
-      const response = await fetch("http://localhost:3001/search", {
+      const response = await fetch("http://192.168.1.5:3001/search", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -41,8 +42,14 @@ export const FandomProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   };
 
+  const clearResults = () => {
+    setResults([]); // 👈 aquí se "limpia" todo lo que sale en el .map
+  };
+
   return (
-    <FandomContext.Provider value={{ results, isLoading, error, fetchFandoms }}>
+    <FandomContext.Provider
+      value={{ results, isLoading, error, fetchFandoms, clearResults }}
+    >
       {children}
     </FandomContext.Provider>
   );
