@@ -8,11 +8,11 @@ import colors from '../../../constants/Colors';
 import fonts from '../../../constants/fonts';
 
 const drawerItems = [
-  { label: 'Lobby', route: './Index', icon: require('../../../assets/images/lobby.png') },
-  { label: 'Perfil', route: './Perfil', icon: require('../../../assets/images/profile.png') },
-  { label: 'Amigos', route: './Amigos', icon: require('../../../assets/images/Friends.png') },
-  { label: 'Notificaciones', route: './Notificaciones', icon: require('../../../assets/images/Bell.png') },
-  { label: 'Configuración', route: './Settings', icon: require('../../../assets/images/Gears.png') },
+  { label: 'Lobby', route: './Index', icon: require('../../../assets/images/lobby.png'), fonts: fonts.pressStart2P },
+  { label: 'Perfil', route: './Perfil', icon: require('../../../assets/images/profile.png'), fonts: fonts.pressStart2P },
+  { label: 'Amigos', route: './Amigos', icon: require('../../../assets/images/Friends.png'), fonts: fonts.pressStart2P },
+  { label: 'Notificaciones', route: './Notificaciones', icon: require('../../../assets/images/Bell.png'), fonts: fonts.pressStart2P },
+  { label: 'Configuración', route: './Settings', icon: require('../../../assets/images/Gears.png'), fonts: fonts.pressStart2P },
 ];
 
 export default function CustomDrawer(props: any) {
@@ -62,7 +62,7 @@ const [userName, setUserName] = useState('Cargando...');
               styles.item,
               pressed && { opacity: 0.6 },
             ]}
-            onPress={() => router.push(item.route)}
+            onPress={() => router.push(item.route as any)}
           >
             <Image source={item.icon} style={styles.icon} />
             <Text style={styles.label}>{item.label}</Text>

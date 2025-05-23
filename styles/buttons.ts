@@ -53,27 +53,31 @@ export const styles = StyleSheet.create({
   },
   backButton: {
     backgroundColor: colors.purple,
-    borderWidth: 2,
+    borderWidth: 5,
     borderColor: colors.white,
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    alignItems: 'center',
+    paddingVertical: 2,
+    paddingHorizontal: 6,
+    width: 300,
+    height: 50,
   },
   backButtonText: {
     fontFamily: fonts.pressStart2P,
     color: colors.white,
-    fontSize: 14,
+    fontSize: 16,
     textAlign: 'left',
   },
   backContent: {
   flexDirection: 'row',
   alignItems: 'center',
-  gap: 10, // si te tira error en versiones antiguas, usá marginRight en el ícono
+  width: 287,
+  height: 40,
+  gap: 110, // si te tira error en versiones antiguas, usá marginRight en el ícono
 },
 
 backIcon: {
-  width: 16,
-  height: 16,
+  width: 30,
+  height: 30,
+  marginRight: 30, // opcional: para separar el ícono del texto
   //tintColor: '#FFFFFF', // opcional: para colorear el ícono blanco si es SVG convertido a PNG negro
 },
 });
