@@ -1,21 +1,33 @@
-import BackButton from '@/components/backButton';
-import TextInputComponent from '@/components/textInput';
-import colors from '@/constants/Colors';
+// 📦 Imports
 import { DrawerNavigationProp } from '@react-navigation/drawer';
 import { useNavigation } from '@react-navigation/native';
 import { useRouter } from 'expo-router';
 import { getAuth } from 'firebase/auth';
 import { doc, getDoc, getFirestore } from 'firebase/firestore';
 import React, { useEffect, useState } from 'react';
-import { Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { FlatList, Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+
+// 🧠 Contexts
+import { useFriendContext } from '@/contexts/FriendsContext';
+
+// 🧩 Components
+import BackButton from '@/components/backButton';
+import FriendCard from '@/components/friendCard';
+import FriendRequestCard from '@/components/friendRequestCard';
+import TextInputComponent from '@/components/textInput';
+
+// 🎨 Estilos y Constantes
+import colors from '@/constants/Colors';
 import fonts from '../../../constants/fonts';
 
 export default function Amigos() {
   const [userName, setUserName] = useState('Cargando...');
   const [searchText, setSearchText] = useState('');
+  const {friends, friendRequests, searchUser, sendFriendRequest, handleRequest } = useFriendContext();
   const router = useRouter();
   const navigation = useNavigation<DrawerNavigationProp<{}>>();
 
+  // 🔍 Obtener nombre del usuario actual
   useEffect(() => {
     const fetchUserName = async () => {
       try {
@@ -27,12 +39,7 @@ export default function Amigos() {
         const userRef = doc(firestore, 'users', user.uid);
         const userSnap = await getDoc(userRef);
 
-        if (userSnap.exists()) {
-          const userData = userSnap.data();
-          setUserName(userData.name || 'Jugador');
-        } else {
-          setUserName('Jugador');
-        }
+        setUserName(userSnap.exists() ? userSnap.data().name || 'Jugador' : 'Jugador');
       } catch (error) {
         console.error('Error obteniendo el nombre:', error);
         setUserName('Jugador');
@@ -42,28 +49,40 @@ export default function Amigos() {
     fetchUserName();
   }, []);
 
+  useEffect(() => {
+  console.log('Amigos:', friends);
+  console.log('Solicitudes:', friendRequests);
+}, [friends, friendRequests]);
+
+
+  const sendInvitation = (id: string) => {
+    console.log('Invitación enviada a', id);
+  };
+
+  const removeFriend = (id: string) => {
+    console.log('Eliminar amigo', id);
+  };
+
   return (
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
-        {/* Encabezado */}
+        {/* 🧠 Header */}
         <View style={styles.header}>
           <Pressable onPress={() => navigation.openDrawer()} style={styles.menuButton}>
             <Text style={styles.menuIcon}>☰</Text>
           </Pressable>
-          <View style={styles.titleContainer}> {/* Nuevo contenedor para el título */}
+          <View style={styles.titleContainer}>
             <Text style={styles.title}>Amigos</Text>
           </View>
-          <View style={styles.userIconContainer}> {/* Nuevo contenedor para el icono */}
+          <View style={styles.userIconContainer}>
             <Image source={require('../../../assets/images/User.png')} style={styles.userIcon} />
           </View>
         </View>
 
+        {/* 🔍 Buscar amigo */}
         <View style={styles.AddFriendRow}>
-          <Pressable onPress={() => console.log('Buscando amigos...')} style={styles.menuButton}>
-            <Image
-              source={require('../../../assets/images/Loupe.png')}
-              style={{ width: 25, height: 25, resizeMode: 'contain' }}
-            />
+          <Pressable onPress={() => searchUser(searchText)} style={styles.menuButton}>
+            <Image source={require('../../../assets/images/Loupe.png')} style={styles.icon} />
           </Pressable>
 
           <TextInputComponent
@@ -71,38 +90,65 @@ export default function Amigos() {
             value={searchText}
             onChangeText={setSearchText}
             color={colors.white}
-            textColor={"7C6E6E"}
+            textColor="7C6E6E"
             textAlign="center"
             width={235}
             height={40}
             containerStyle={{ marginBottom: 0 }}
           />
 
-          <Pressable onPress={() => console.log('Añadiste un nuevo amigo')} style={styles.menuButton}>
-            <Image
-              source={require('../../../assets/images/Add.png')}
-              style={{ width: 25, height: 25, resizeMode: 'contain' }}
-            />
+          <Pressable onPress={() => sendFriendRequest(searchText)} style={styles.menuButton}>
+            <Image source={require('../../../assets/images/Add.png')} style={styles.icon} />
           </Pressable>
         </View>
-        {/* Aquí vendría el dropdown personalizado después */}
 
-        {/* Aquí iría la lista de amigos, que sera renderizada dependiendo de la cantidad de amigos que tenga el usuario iniciado */}
-        {/* FriendCardComponent */}
-        {/* Aquí iría la lista de solicitudes de amistad */}
-        {/* FriendRequestCardComponent */}
+        {/* 👫 Lista de amigos */}
+        <FlatList
+        data={friends}
+        keyExtractor={(item) => item.id}
+        renderItem={({ item }) => (
+          <FriendCard
+            name={item.name}
+            score={item.score}
+            onInvite={() => sendInvitation(item.id)}
+            onDelete={() => removeFriend(item.id)}
+          />
+        )}
+        ListEmptyComponent={<Text style={styles.subtitle}>No tienes amigos</Text>}
+      contentContainerStyle={{ gap: 15 }}
+  showsVerticalScrollIndicator={false}
+/>
 
-        {/* Botón de regresar */}
+
+
+        <View style={styles.RequestsContainer}>
+          <Image source={require('../../../assets/images/Mailbox.png')} style={styles.icon} />
+          <Text style={styles.title}>Solicitudes</Text>
+        </View>
+
+        {/* 📩 Solicitudes */}  
+        {friendRequests.map((request) => (
+          <FriendRequestCard
+            key={request.id}
+            name={request.name}
+            onAccept={() => handleRequest(request.id, 'accept')}
+            onReject={() => handleRequest(request.id, 'reject')}    
+          />
+        ))}
+
+        {/* ⬅️ Volver */}
         <BackButton onPress={() => router.back()} />
       </ScrollView>
     </View>
   );
 }
 
+// 🎨 Estilos
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.blueDark,
+    paddingTop: 35,
   },
   scrollContent: {
     flexGrow: 1,
@@ -115,7 +161,7 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between', // Mantenemos space-between
+    justifyContent: 'space-between',
     marginBottom: 20,
     paddingHorizontal: 20,
     width: '100%',
@@ -129,37 +175,50 @@ const styles = StyleSheet.create({
     fontSize: 24,
     color: colors.white,
   },
-  titleRow: {
-    flexDirection: 'row',
+  titleContainer: {
+    flex: 1,
     alignItems: 'center',
-    gap: 10,
-    marginLeft: 'auto', // Empuja el bloque a la derecha
   },
   title: {
     fontFamily: fonts.pressStart2P,
     fontSize: 22,
     color: colors.white,
-    textAlign: 'center',
+    textAlign: 'left',
   },
-  titleContainer: { 
-    flex: 1,
-    alignItems: 'center', // Centramos el título dentro de su contenedor
+  subtitle: {
+    fontFamily: fonts.pressStart2P,
+    fontSize: 14,
+    color: colors.white,
+    textAlign: 'left',
+  },
+  userIconContainer: {
+    alignItems: 'center',
   },
   userIcon: {
     width: 35,
     height: 35,
     resizeMode: 'contain',
   },
-  userIconContainer: {
-    alignItems: 'center',
-  },
   AddFriendRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     marginBottom: 30,
-    paddingHorizontal: 20,
     width: '100%',
     gap: 10,
+    paddingRight: 20,
+  },
+  icon: {
+    width: 25,
+    height: 25,
+    resizeMode: 'contain',
+  },
+  RequestsContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    textAlign: 'left',
+    marginBottom: 30,
+    gap: 30,
   },
 });
