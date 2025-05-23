@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState } from "react";
 import { FandomItem } from "../interfaces/common";
 
 const FandomContext = createContext<FandomContextType | undefined>(undefined);
+const ip = process.env.EXPO_PUBLIC_API_IP
 
 interface FandomContextType {
   results: FandomItem[];
@@ -23,7 +24,7 @@ export const FandomProvider: React.FC<{ children: React.ReactNode }> = ({
     setError(null);
 
     try {
-      const response = await fetch("http://192.168.1.5:3001/search", {
+      const response = await fetch(`http://${ip}:3001/search`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -1,6 +1,8 @@
 // utils/geminiApi.ts
 
-const BACKEND_URL = "http://192.168.1.5:3001"; // Asegúrate que esté sin "/" final
+const ip = process.env.EXPO_PUBLIC_API_IP
+
+const BACKEND_URL = `http://${ip}:3001`; // Asegúrate que esté sin "/" final
 
 type GameResult = {
   name: string;
