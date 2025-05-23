@@ -41,7 +41,7 @@ export default function SearchScreen() {
 
     if (titulo && url) {
       await addFandomToUser(user.uid, titulo, url);
-      router.push({ pathname: "/Search", params: { reset: "1" } });
+      router.replace({ pathname: "/Search", params: { reset: "1" } });
     }
   };
 

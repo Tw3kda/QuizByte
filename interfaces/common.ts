@@ -3,9 +3,9 @@ export interface Fandom {
   name: string;
 }
 
-export interface FriendData {
-  id: string;
-  name: string;
+export interface Friend {
+  ID: string;
+  Name: string;
 }
 
 export interface UserData {
@@ -13,10 +13,10 @@ export interface UserData {
   email: string;
   name: string;
   fandoms: Record<string, Fandom>;
-  friends: Record<string, FriendData>;
+  friends: Record<string, Friend>;
   stats: [number, number, number]; // [score, games, rank]
-  friendRequests?: FriendData[];
 }
+
 export interface FandomItem {
   name: string;
   imageUrl: string;
@@ -28,13 +28,7 @@ export interface GeminiRequest {
 }
 
 export interface GeminiResponse {
+  games: null;
   text: string;
   finishReason?: string;
 }
-
-export interface User {
-  uid: string;
-  email: string;
-  displayName: string;
-}
-

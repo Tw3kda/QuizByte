@@ -5,12 +5,12 @@ import * as ImagePicker from "expo-image-picker";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useEffect, useRef, useState } from "react";
 import {
-    Alert,
-    Image,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  Alert,
+  Image,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import colors from "../constants/Colors";
 
@@ -122,7 +122,7 @@ export default function CameraScreen({ navigation }: any) {
 
     console.log(game)
 
-    router.push({
+    router.replace({
       pathname: "/confirm",
       params: {
         url: game.imageUrl ?? "",
