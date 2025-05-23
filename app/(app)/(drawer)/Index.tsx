@@ -81,7 +81,7 @@ export default function Index() {
       <WhiteButton
         title="Agregar Fandoms"
         color={colors.pink}
-        onPress={() => router.push('/(app)/(addGame)/Search')}
+        onPress={() => router.push('/(app)/(addFandom)/Search')}
       />
     </ScrollView>
   </View>
