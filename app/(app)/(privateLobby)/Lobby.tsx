@@ -1,165 +1,67 @@
-import { useFonts } from "expo-font";
+import WhiteButton from "@/components/whiteButton";
+import colors from "@/constants/Colors";
 import { router } from "expo-router";
-import { getAuth } from "firebase/auth";
-import { doc, getDoc, getFirestore, onSnapshot, setDoc } from "firebase/firestore";
-import React, { useEffect, useState } from "react";
+import { doc, getFirestore, onSnapshot } from "firebase/firestore";
+import React, { useContext, useEffect } from "react";
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import WhiteButton from "../../../components/whiteButton";
-import colors from "../../../constants/Colors";
+import { LobbyContext } from "../../../contexts/LobbyContext"; // ajusta la ruta si es necesario
 
-export default function lobby() {
-  const [userName, setUserName] = useState<string | null>(null);
-  const [uid, setUid] = useState<string | null>(null);
-  const [guestName, setGuestName] = useState("+");
-  const [lobbyCreated, setLobbyCreated] = useState(false);
-  const [lobbyId, setLobbyId] = useState<string | null>(null);
 
-  const [fontsLoaded] = useFonts({
-    "PressStart2P-Regular": require("../../../assets/fonts/PressStart2P-Regular.ttf"),
-  });
+export default function Lobby() {
+  const lobby = useContext(LobbyContext);
+ 
 
-  /////////////////////////////////////////
+  if (!lobby) {
+    return <Text>Cargando contexto...</Text>;
+  }
+
+   const { uid, userName, guestName, lobbyId, createLobby ,setGuestName} = lobby;
+
   useEffect(() => {
-    const fetchUserInfo = async () => {
-      try {
-        const auth = getAuth();
-        const user = auth.currentUser;
-
-        if (user) {
-          setUid(user.uid); // set UID
-          const db = getFirestore();
-          const userRef = doc(db, "users", user.uid); // or "profiles", depending on your structure
-          const docSnap = await getDoc(userRef);
-
-          if (docSnap.exists()) {
-            const data = docSnap.data();
-            setUserName(data.name); // or whatever field your user document has
-          } else {
-            console.log("No user document found");
-          }
-        } else {
-          console.log("No user is logged in");
-        }
-      } catch (error) {
-        console.error("Error fetching user info:", error);
+    const create = async () => {
+      if (lobby?.lobbyId === null) {
+        await lobby?.createLobby();
       }
     };
-
-    fetchUserInfo();
+    create();
   }, []);
 
-  ///////////////////////////////////////////////////////////////////////////
 
-useEffect(() => {
-    if (!lobbyId) return;
+  useEffect(() => {
+  if (!lobbyId) {
+    console.log("No lobbyId, skipping listener setup");
+    return;
+  }
 
-    const db = getFirestore();
-    const lobbyRef = doc(db, "lobbies", lobbyId);
+  console.log("Setting up onSnapshot for lobbyId:", lobbyId);
+  const db = getFirestore();
+  const lobbyRef = doc(db, "lobbies", lobbyId);
 
-    // Listener en tiempo real:
-    const unsubscribe = onSnapshot(lobbyRef, (docSnap) => {
+  const unsubscribe = onSnapshot(
+    lobbyRef,
+    (docSnap) => {
+      console.log("onSnapshot triggered for lobbyId:", lobbyId);
       if (docSnap.exists()) {
         const data = docSnap.data();
-        setGuestName(data.players?.IDplayer2 || "+");
-        console.log(data.players?.IDplayer2)
+        console.log("Firestore data:", data);
+        const player2 = data.players?.IDplayer2;
+        console.log("Player2 value:", player2);
+        setGuestName(player2 && player2.trim() !== "" ? player2 : "+");
       } else {
-        console.log("Lobby no existe");
+        console.log("Lobby document does not exist");
         setGuestName("+");
       }
-    }, (error) => {
-      console.error("Error escuchando lobby:", error);
-    });
-
-    // Cleanup al desmontar
-    return () => unsubscribe();
-  }, [lobbyId]);
-
-
-useEffect(() => {
-  console.log("guest actualizado a:", guestName);
-}, [guestName]);
-
-  //////////////////////////////////////////////////////////////////////
-
-useEffect(() => {
-  if (uid && userName && !lobbyCreated) {
-    createLobby(uid).then((id) => {
-      if (id) {
-        setLobbyId(id);
-        setLobbyCreated(true);
-      }
-    });
-  }
-}, [uid, userName, lobbyCreated]);
-
-  ///////////////////////////////////////
-  async function createLobby(uid: string) {
-    const db = getFirestore();
-
-    async function generateUniqueLobbyId(): Promise<string> {
-      const newId = generateCode();
-      const docRef = doc(db, "lobbies", newId);
-      const docSnap = await getDoc(docRef);
-
-      if (docSnap.exists()) {
-        // ID already used, try again
-        return await generateUniqueLobbyId();
-      } else {
-        // ID is unique
-        return newId;
-      }
+    },
+    (error) => {
+      console.error("Firestore listener error:", error);
     }
+  );
 
-    try {
-      const lobbyId = await generateUniqueLobbyId();
-
-      const lobbyData = {
-        Stats: {
-          PreguntasCorrectasP1: 0,
-          PreguntasCorrectasP2: 0,
-          PuntosP1: 0,
-          PuntosP2: 0,
-          p1Finished: false,
-          p2Finished: false,
-        },
-        host: uid,
-        players: {
-          IDplayer1: String(userName),
-          IDplayer2: "",
-        },
-      };
-
-      console.log(userName)
-
-      await setDoc(doc(db, "lobbies", lobbyId), lobbyData);
-      console.log(" Lobby creado con ID:", lobbyId);
-      return lobbyId; // You can return this if you want to show/share it
-    } catch (error) {
-      console.error(" Error al crear el lobby:", error);
-    }
-  }
-  //////////////////////////////////////////////////////////////////////////
-
-  function generateCode(): string {
-    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-    let code = "";
-
-    for (let i = 0; i < 12; i++) {
-      const randomIndex = Math.floor(Math.random() * chars.length);
-      code += chars[randomIndex];
-
-      // Add hyphens after every 4 characters (except the last one)
-      if ((i + 1) % 4 === 0 && i < 11) {
-        code += "-";
-      }
-    }
-
-    return code;
-  }
-  ////////////////////////////////////////////////////////////////////////////////
-
-
- 
+  return () => {
+    console.log("Cleaning up onSnapshot for lobbyId:", lobbyId);
+    unsubscribe();
+  };
+}, [lobbyId, setGuestName]);
 
   return (
     <View style={styles.container}>
@@ -171,7 +73,10 @@ useEffect(() => {
           />
         </TouchableOpacity>
 
-        <Text numberOfLines={1} style={styles.title}> Lobby Privado</Text>
+        <Text numberOfLines={1} style={styles.title}>
+          {" "}
+          Lobby Privado
+        </Text>
       </View>
 
       <Image
@@ -204,7 +109,12 @@ useEffect(() => {
       <View style={styles.startContainer}>
         <WhiteButton
           title="Iniciar partida"
-          onPress={() => {}}
+          onPress={() => {
+            if (guestName !== "+" && guestName.trim() !== "") {
+            router.push("/(app)/(game)/GameScreen")
+              console.log("Iniciando partida...");
+            }
+          }}
           color={colors.red}
           textColor={colors.white}
         />
