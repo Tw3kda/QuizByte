@@ -12,7 +12,7 @@ import fonts from '../../../constants/fonts';
 export default function Index() {
   const [userName, setUserName] = useState('Cargando...');
   const router = useRouter();
-  const navigation = useNavigation<DrawerNavigationProp<{}>>(); // Drawer navigation pa' abrir el menú
+  const navigation = useNavigation<DrawerNavigationProp<{}>>();
 
   useEffect(() => {
     const fetchUserName = async () => {
@@ -81,11 +81,12 @@ export default function Index() {
       <WhiteButton
         title="Agregar Fandoms"
         color={colors.pink}
-        onPress={() => router.push('/(app)/(addGame)/Index')}
+        onPress={() => router.push('/(app)/(addFandom)/Search')}
       />
     </View>
   </View>
 );
+
 
 }
 
