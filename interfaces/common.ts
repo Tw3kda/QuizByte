@@ -3,10 +3,15 @@ export interface Fandom {
   name: string;
 }
 
+
+export interface Friend {
+  ID: string;
+  Name: string;
+
 export interface FriendData {
   id: string;
   name: string;
-  score?: number;
+  score?: number
 }
 
 export interface UserData {
@@ -14,9 +19,11 @@ export interface UserData {
   email: string;
   name: string;
   fandoms: Record<string, Fandom>;
+
   stats: [number, number, number]; // [score, games, rank]
   friends?: Record<string, FriendData>;
   friendRequests?: FriendData[];
+
 }
 export interface User {
   uid: string;
