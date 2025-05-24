@@ -51,7 +51,7 @@ import { AuthContext } from '../../contexts/AuthContext'; // Ajusta el path si e
             onChangeText={setPassword}
             secureTextEntry
             width={278}
-            height={55}
+            height={55} 
           />
         </View>
 

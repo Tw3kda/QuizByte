@@ -69,7 +69,7 @@ export default function Index() {
       <WhiteButton
         title="Crear Lobby Privado"
         color={colors.purple}
-        onPress={() => router.push('/(app)/(privateLobby)/Index')}
+        onPress={() => router.push('/(app)/(privateLobby)/Lobby')}
       />
 
       <WhiteButton

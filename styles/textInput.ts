@@ -5,7 +5,7 @@ import fonts from '../constants/fonts';
 export const styles = StyleSheet.create({
   inputContainer: {
     paddingHorizontal: 12,
-    paddingVertical: 14,
+    paddingVertical: 0,
     backgroundColor: colors.grayDark,
     width: 279,
     height: 55,
@@ -15,8 +15,9 @@ export const styles = StyleSheet.create({
   input: {
     color: colors.white,
     fontFamily: fonts.pressStart2P,
-    fontSize: 12,
+    fontSize: 10,
     textAlignVertical: 'center',
     height: '100%',
+    
   },
 });

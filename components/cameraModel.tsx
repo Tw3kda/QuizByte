@@ -122,7 +122,7 @@ export default function CameraScreen({ navigation }: any) {
 
     console.log(game)
 
-    router.replace({
+    router.push({
       pathname: "/confirm",
       params: {
         url: game.imageUrl ?? "",
