@@ -14,6 +14,7 @@ interface Props {
   textAlign?: 'left' | 'center' | 'right';
   width?: string | number;
   height?: string | number;
+  placeholderTextColor?: string;
 }
 
 const TextInputComponent = ({
