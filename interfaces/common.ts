@@ -11,8 +11,7 @@ export interface Friend {
 export interface FriendData {
   id: string;
   name: string;
-  score?: number;
-
+  score?: number
 }
 
 export interface UserData {
@@ -21,20 +20,16 @@ export interface UserData {
   name: string;
   fandoms: Record<string, Fandom>;
 
-  friends: Record<string, Friend>;
-  stats: [number, number, number]; // [score, games, rank]
-
   stats: [number, number, number]; // [score, games, rank]
   friends?: Record<string, FriendData>;
   friendRequests?: FriendData[];
 
 }
-
-export interface FandomItem {
-  name: string;
-  imageUrl: string;
+export interface User {
+  uid: string;
+  email: string;
+  displayName: string;
 }
-
 export interface GeminiRequest {
   prompt: string;
   imageBase64?: string;
