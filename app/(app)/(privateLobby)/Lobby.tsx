@@ -111,7 +111,10 @@ export default function Lobby() {
           title="Iniciar partida"
           onPress={() => {
             if (guestName !== "+" && guestName.trim() !== "") {
-            router.push("/(app)/(game)/GameScreen")
+            router.replace({
+                      pathname: `/(app)/(game)/GameScreen`,
+                      params: { id: lobbyId , p:1}, 
+                    });
               console.log("Iniciando partida...");
             }
           }}

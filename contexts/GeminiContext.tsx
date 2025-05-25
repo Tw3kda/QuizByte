@@ -22,6 +22,9 @@ type GameResult = {
 };
 
 export const GeminiProvider = ({ children }: { children: ReactNode }) => {
+
+  const ip = process.env.EXPO_PUBLIC_API_IP
+
   const [imagenUri, setImagenUri] = useState<string | null>(null);
   const [response, setResponse] = useState<GeminiResponse | null>(null);
   const [loading, setLoading] = useState(false);
@@ -42,7 +45,7 @@ export const GeminiProvider = ({ children }: { children: ReactNode }) => {
 
   const getResponse = async (prompt: string): Promise<string> => {
     try {
-      const res = await fetch("http://<TU_BACKEND_URL>/geminiText", {
+      const res = await fetch(`http://${ip}:3001/geminiText`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

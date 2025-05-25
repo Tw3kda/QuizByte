@@ -1,3 +1,4 @@
+import { GameProvider } from "@/contexts/GameContext";
 import { LobbyProvider } from "@/contexts/LobbyContext";
 import { Stack } from "expo-router";
 import React from "react";
@@ -6,7 +7,9 @@ import { GeminiProvider } from "@/contexts/GeminiContext";
 
 export default function _layout() {
   return (
-    <GeminiProvider>
+    <GameProvider> 
+
+        <GeminiProvider>
       <LobbyProvider>
         <Stack screenOptions={{ headerShown: false }}>
           <Stack.Screen name="JoinedLobby" options={{ headerShown: false }} />
@@ -16,5 +19,9 @@ export default function _layout() {
         </Stack>
       </LobbyProvider>
     </GeminiProvider>
+
+
+    </GameProvider>
+    
   );
 }

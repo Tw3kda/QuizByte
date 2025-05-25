@@ -33,3 +33,7 @@ export interface GeminiResponse {
   text: string;
   finishReason?: string;
 }
+export interface FandomItem {
+  name: string;
+  imageUrl: string;
+}
