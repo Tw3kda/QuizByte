@@ -3,32 +3,28 @@ export interface Fandom {
   name: string;
 }
 
-
-export interface Friend {
-  ID: string;
-  Name: string;
-
-export interface FriendData {
+export interface FriendMap {
   id: string;
   name: string;
+  stats?: number[];
   score?: number;
+}
 
+export interface FriendRequest {
+  id: string;
+  name: string;
 }
 
 export interface UserData {
-  id: string;
   email: string;
+  id: string;
   name: string;
-  fandoms: Record<string, Fandom>;
-
-  friends: Record<string, Friend>;
-  stats: [number, number, number]; // [score, games, rank]
-
-  stats: [number, number, number]; // [score, games, rank]
-  friends?: Record<string, FriendData>;
-  friendRequests?: FriendData[];
-
+  stats?: number[];
+  friends?: FriendMap;
+  fandoms?: Record<string, Fandom>;
+  friendRequests?: FriendRequest;
 }
+
 
 export interface FandomItem {
   name: string;

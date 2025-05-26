@@ -1,92 +1,146 @@
+// 📁 components/FriendCard.tsx
+
 import colors from '@/constants/Colors';
 import fonts from '@/constants/fonts';
 import React from 'react';
-import { Alert, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
 import WhiteButton from './whiteButton';
 
 interface FriendCardProps {
+  id: string;
   name: string;
   score?: number;
-  onInvite: () => void;
-  onDelete: () => void;
+  onInvite?: () => void;
+  onDelete?: () => void;
+  actionLabel?: string;
+  onAction?: () => void;
 }
 
-export default function FriendCard({ name, score, onInvite, onDelete }: FriendCardProps) {
-  const handleInvite = () => {
-    onInvite();
-    Alert.alert('Invitación enviada', `Has invitado a ${name} al lobby.`);
-  };
-
+const FriendCard: React.FC<FriendCardProps> = ({
+  name,
+  score,
+  onInvite,
+  onDelete,
+  actionLabel,
+  onAction,
+}) => {
   return (
     <View style={styles.card}>
-      {/* Fila 1: avatar + nombre + score */}
-      <View style={styles.row}>
-        <Image source={require('../assets/images/User.png')} style={styles.icon} />
-        <Text style={styles.name}>{name}</Text>
-        <View style={styles.scoreContainer}>
-          <Image source={require('../assets/images/Trophie.png')} style={styles.trophy} />
-          <Text style={styles.score}>{score ?? 0}</Text>
+      <View style={styles.infoRow}>
+        <Image
+          source={require('@/assets/images/User.png')}
+          style={styles.avatar}
+        />
+        <View style={styles.nameScoreContainer}>
+          <Text style={styles.name}>{name}</Text>
+          <View style={styles.scoreRow}>
+            <Image
+              source={require('@/assets/images/Trophie.png')}
+              style={styles.trophy}
+            />
+            <Text style={styles.score}>{score}</Text>
+          </View>
         </View>
       </View>
 
-      {/* Fila 2: botones */}
-      <View style={styles.row}>
-        <WhiteButton title="INVITAR" color={colors.pink} onPress={handleInvite} />
-        <TouchableOpacity onPress={onDelete}>
-          <Image source={require('../assets/images/TrashCan.png')} style={styles.deleteIcon} />
-        </TouchableOpacity>
+      <View style={styles.actionsContainer}>
+        {onInvite && (
+          <WhiteButton
+            title="INVITAR"
+            color={colors.orange}
+            onPress={onInvite}
+          />
+        )}
+        {onDelete && (
+          <Pressable onPress={onDelete} style={styles.trashButton}>
+            <Image
+              source={require('@/assets/images/TrashCan.png')}
+              style={styles.trashIcon}
+            />
+          </Pressable>
+        )}
+        {actionLabel && onAction && (
+          <Pressable onPress={onAction} style={styles.actionButton}>
+            <Text style={styles.actionText}>{actionLabel}</Text>
+          </Pressable>
+        )}
       </View>
     </View>
   );
-}
+};
+
+export default FriendCard;
 
 const styles = StyleSheet.create({
   card: {
     backgroundColor: colors.grayDark,
-    padding: 16,
-    width: 300,
-    gap: 8,
-    flexDirection: 'column',
-    borderRadius: 10,
+    padding: 12,
+    width: '100%',
   },
-  row: {
+  infoRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
   },
-  icon: {
+  avatar: {
     width: 40,
     height: 40,
-    resizeMode: 'contain',
+    marginRight: 12,
+  },
+  nameScoreContainer: {
+    flex: 1,
   },
   name: {
-    flex: 1,
-    flexShrink: 1,
     fontFamily: fonts.pressStart2P,
-    fontSize: 14,
+    fontSize: 12,
     color: colors.white,
-    textAlign: 'left',
+    marginBottom: 4,
   },
-  scoreContainer: {
+  scoreRow: {
     flexDirection: 'row',
     alignItems: 'center',
+    gap: 5,
   },
   trophy: {
-    width: 24,
-    height: 24,
-    resizeMode: 'contain',
+    width: 16,
+    height: 16,
   },
   score: {
     fontFamily: fonts.pressStart2P,
-    fontSize: 14,
+    fontSize: 12,
     color: colors.purple,
-    marginLeft: 4,
   },
-  deleteIcon: {
+  actionsContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginTop: 12,
+  },
+  inviteButton: {
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderWidth: 2,
+    borderColor: colors.orange,
+    backgroundColor: colors.orange,
+  },
+  inviteText: {
+    fontFamily: fonts.pressStart2P,
+    fontSize: 12,
+    color: colors.white,
+  },
+  trashButton: {
+    padding: 5,
+  },
+  trashIcon: {
     width: 32,
     height: 32,
-    resizeMode: 'contain',
+    tintColor: colors.red,
+  },
+  actionButton: {
+    padding: 6,
+  },
+  actionText: {
+    fontFamily: fonts.pressStart2P,
+    fontSize: 12,
+    color: colors.purple,
   },
 });

@@ -1,5 +1,5 @@
 import colors from "@/constants/Colors";
-import { FriendProvider } from "@/contexts/FriendsContext";
+import { FriendsProvider } from "@/contexts/FriendsContext";
 import { NotificationProvider } from "@/contexts/NotifcationContext";
 import Drawer from "expo-router/drawer";
 import { AuthProvider } from '../contexts/AuthContext'; // Ajusta la ruta si cambia
@@ -10,7 +10,7 @@ export default function RootLayout() {
   return (
     <AuthProvider>
       <NotificationProvider>
-        <FriendProvider userId={""}>
+        <FriendsProvider>
           <Drawer
             drawerContent={(props) => <CustomDrawer {...props} />}
             screenOptions={{
@@ -21,7 +21,7 @@ export default function RootLayout() {
             },
           }}
           />
-        </FriendProvider>
+        </FriendsProvider>
       </NotificationProvider>
     </AuthProvider>
   );

@@ -1,14 +1,13 @@
 // 📦 Imports
+import { FriendMap } from '@/interfaces/common';
 import { DrawerNavigationProp } from '@react-navigation/drawer';
 import { useNavigation } from '@react-navigation/native';
 import { useRouter } from 'expo-router';
-import { getAuth } from 'firebase/auth';
-import { doc, getDoc, getFirestore } from 'firebase/firestore';
-import React, { useEffect, useState } from 'react';
-import { FlatList, Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import React, { useState } from 'react';
+import { Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 // 🧠 Contexts
-import { useFriendContext } from '@/contexts/FriendsContext';
+import { useFriends } from '@/contexts/FriendsContext';
 
 // 🧩 Components
 import BackButton from '@/components/backButton';
@@ -18,55 +17,54 @@ import TextInputComponent from '@/components/textInput';
 
 // 🎨 Estilos y Constantes
 import colors from '@/constants/Colors';
-import fonts from '../../../constants/fonts';
+import fonts from '@/constants/fonts';
 
 export default function Amigos() {
-  const [userName, setUserName] = useState('Cargando...');
   const [searchText, setSearchText] = useState('');
-  const {friends, friendRequests, searchUser, sendFriendRequest, handleRequest } = useFriendContext();
+  const [searchResult, setSearchResult] = useState<FriendMap | null>(null);
+
+  const {
+    friends,
+    friendRequests,
+    searchUser,
+    sendFriendRequest,
+    handleRequest,
+  } = useFriends();
+
   const router = useRouter();
   const navigation = useNavigation<DrawerNavigationProp<{}>>();
 
-  // 🔍 Obtener nombre del usuario actual
-  useEffect(() => {
-    const fetchUserName = async () => {
-      try {
-        const auth = getAuth();
-        const user = auth.currentUser;
-        if (!user) return;
-
-        const firestore = getFirestore();
-        const userRef = doc(firestore, 'users', user.uid);
-        const userSnap = await getDoc(userRef);
-
-        setUserName(userSnap.exists() ? userSnap.data().name || 'Jugador' : 'Jugador');
-      } catch (error) {
-        console.error('Error obteniendo el nombre:', error);
-        setUserName('Jugador');
-      }
-    };
-
-    fetchUserName();
-  }, []);
-
-  useEffect(() => {
-  console.log('Amigos:', friends);
-  console.log('Solicitudes:', friendRequests);
-}, [friends, friendRequests]);
-
-
-  const sendInvitation = (id: string) => {
-    console.log('Invitación enviada a', id);
+  // 🔍 Buscar amigo por nombre
+  const handleSearch = async () => {
+    const result = await searchUser(searchText.trim());
+    setSearchResult(result);
   };
 
+  // ➕ Enviar solicitud de amistad
+  const handleSendRequest = async () => {
+    if (searchResult) {
+      await sendFriendRequest(searchResult.id, searchResult.name || 'Amigo');
+      setSearchResult(null);
+      setSearchText('');
+    }
+  };
+
+  // ✉️ Invitar a jugar
+  const sendInvitation = (id: string) => {
+    console.log('Invitación enviada a', id);
+    // TODO: lógica de notificación
+  };
+
+  // 🗑️ Eliminar amigo
   const removeFriend = (id: string) => {
     console.log('Eliminar amigo', id);
+    // TODO: lógica de eliminar
   };
 
   return (
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
-        {/* 🧠 Header */}
+        {/* 🔝 Header */}
         <View style={styles.header}>
           <Pressable onPress={() => navigation.openDrawer()} style={styles.menuButton}>
             <Text style={styles.menuIcon}>☰</Text>
@@ -79,9 +77,9 @@ export default function Amigos() {
           </View>
         </View>
 
-        {/* 🔍 Buscar amigo */}
+        {/* 🔎 Buscar amigo */}
         <View style={styles.AddFriendRow}>
-          <Pressable onPress={() => searchUser(searchText)} style={styles.menuButton}>
+          <Pressable onPress={handleSearch} style={styles.menuButton}>
             <Image source={require('../../../assets/images/Loupe.png')} style={styles.icon} />
           </Pressable>
 
@@ -90,58 +88,74 @@ export default function Amigos() {
             value={searchText}
             onChangeText={setSearchText}
             color={colors.white}
-            textColor="7C6E6E"
+            textColor={colors.black}
             textAlign="center"
             width={235}
             height={40}
             containerStyle={{ marginBottom: 0 }}
           />
 
-          <Pressable onPress={() => sendFriendRequest(searchText)} style={styles.menuButton}>
+          <Pressable
+            onPress={handleSendRequest}
+            style={styles.menuButton}
+            disabled={!searchResult}
+          >
             <Image source={require('../../../assets/images/Add.png')} style={styles.icon} />
           </Pressable>
         </View>
 
-        {/* 👫 Lista de amigos */}
-        <FlatList
-        data={friends}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
+        {/* 👤 Resultado búsqueda */}
+        {searchResult && (
           <FriendCard
-            name={item.name}
-            score={item.score}
-            onInvite={() => sendInvitation(item.id)}
-            onDelete={() => removeFriend(item.id)}
+            id={searchResult.id}
+            name={searchResult.name}
+            score={searchResult.stats?.[0]}
+            onInvite={() => {}}
+            onDelete={() => {}}
+            actionLabel="Enviar solicitud"
+            onAction={handleSendRequest}
           />
         )}
-        ListEmptyComponent={<Text style={styles.subtitle}>No tienes amigos</Text>}
-      contentContainerStyle={{ gap: 15 }}
-  showsVerticalScrollIndicator={false}
-/>
 
+        {/* 👬 Lista de amigos */}
+        {friends.length === 0 ? (
+          <Text style={styles.title}>No tienes amigos aún</Text>
+        ) : (
+          friends.map((friend) => (
+            <FriendCard
+              key={friend.id}
+              id={friend.id}
+              name={friend.name}
+              score={friend.score}
+              onInvite={() => sendInvitation(friend.id)}
+              onDelete={() => removeFriend(friend.id)}
+            />
+          ))
+        )}
 
-
-        <View style={styles.RequestsContainer}>
-          <Image source={require('../../../assets/images/Mailbox.png')} style={styles.icon} />
+        {/* ✉️ Solicitudes */}
+        <View style={styles.RequestsRow}>
+          <Image source={require('../../../assets/images/Mailbox.png')} style={styles.userIcon} />
           <Text style={styles.title}>Solicitudes</Text>
         </View>
 
-        {/* 📩 Solicitudes */}  
         {friendRequests.map((request) => (
           <FriendRequestCard
             key={request.id}
+            id={request.id}
             name={request.name}
             onAccept={() => handleRequest(request.id, 'accept')}
-            onReject={() => handleRequest(request.id, 'reject')}    
+            onReject={() => handleRequest(request.id, 'reject')}
           />
         ))}
 
         {/* ⬅️ Volver */}
-        <BackButton onPress={() => router.back()} />
+        <BackButton onPress={() => router.push('/(app)/(drawer)/Index')} />
       </ScrollView>
     </View>
   );
 }
+
 
 // 🎨 Estilos
 const styles = StyleSheet.create({
@@ -171,7 +185,7 @@ const styles = StyleSheet.create({
     width: 50,
     height: 50,
   },
-  menuIcon: {
+  menuIcon: { 
     fontSize: 24,
     color: colors.white,
   },
@@ -183,13 +197,7 @@ const styles = StyleSheet.create({
     fontFamily: fonts.pressStart2P,
     fontSize: 22,
     color: colors.white,
-    textAlign: 'left',
-  },
-  subtitle: {
-    fontFamily: fonts.pressStart2P,
-    fontSize: 14,
-    color: colors.white,
-    textAlign: 'left',
+    textAlign: 'center',
   },
   userIconContainer: {
     alignItems: 'center',
@@ -208,17 +216,17 @@ const styles = StyleSheet.create({
     gap: 10,
     paddingRight: 20,
   },
+  RequestsRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 20,
+    paddingHorizontal: 20,
+    width: '100%',
+  },
   icon: {
     width: 25,
     height: 25,
     resizeMode: 'contain',
-  },
-  RequestsContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    textAlign: 'left',
-    marginBottom: 30,
-    gap: 30,
   },
 });

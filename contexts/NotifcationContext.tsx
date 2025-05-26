@@ -94,3 +94,6 @@ export async function registerForPushNotificationsAsync(): Promise<string | unde
 
   return token;
 }
+
+// Funcion para enviar los 3 tipos de notificaciones: "invite", "triviaWin", "friendRequest"
+

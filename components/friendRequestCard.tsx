@@ -1,28 +1,38 @@
+// 📁 components/FriendRequestCard.tsx
+
 import colors from '@/constants/Colors';
 import fonts from '@/constants/fonts';
 import React from 'react';
-import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
 
 interface FriendRequestCardProps {
+  id: string;
   name: string;
   onAccept: () => void;
   onReject: () => void;
 }
 
-const FriendRequestCard: React.FC<FriendRequestCardProps> = ({ name, onAccept, onReject }) => {
+const FriendRequestCard: React.FC<FriendRequestCardProps> = ({
+  name,
+  onAccept,
+  onReject,
+}) => {
   return (
-    <View style={styles.container}>
-      <View style={styles.left}>
-        <Image source={require('../assets/images/User.png')} style={styles.avatar} />
+    <View style={styles.card}>
+      <View style={styles.infoContainer}>
+        <Image
+          source={require('@/assets/images/User.png')}
+          style={styles.avatar}
+        />
         <Text style={styles.name}>{name}</Text>
       </View>
-      <View style={styles.right}>
-        <TouchableOpacity onPress={onAccept}>
-          <Image source={require('../assets/images/Accept.png')} style={styles.icon} />
-        </TouchableOpacity>
-        <TouchableOpacity onPress={onReject}>
-          <Image source={require('../assets/images/Decline.png')} style={styles.icon} />
-        </TouchableOpacity>
+      <View style={styles.actionsContainer}>
+        <Pressable onPress={onAccept} style={styles.acceptButton}>
+          <Text style={styles.buttonText}>Aceptar</Text>
+        </Pressable>
+        <Pressable onPress={onReject} style={styles.rejectButton}>
+          <Text style={styles.buttonText}>Rechazar</Text>
+        </Pressable>
       </View>
     </View>
   );
@@ -31,37 +41,53 @@ const FriendRequestCard: React.FC<FriendRequestCardProps> = ({ name, onAccept, o
 export default FriendRequestCard;
 
 const styles = StyleSheet.create({
-  container: {
+  card: {
     backgroundColor: colors.grayDark,
-    padding: 12,
-    marginVertical: 8,
-    borderRadius: 8,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    padding: 15,
+    marginVertical: 10,
+    width: '100%',
+    shadowColor: colors.black,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    elevation: 3,
   },
-  left: {
+  infoContainer: {
     flexDirection: 'row',
     alignItems: 'center',
+    marginBottom: 10,
   },
   avatar: {
-    width: 32,
-    height: 32,
-    resizeMode: 'contain',
-    marginRight: 10,
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    marginRight: 15,
   },
   name: {
-    color: colors.white,
-    fontSize: 18,
     fontFamily: fonts.pressStart2P,
+    fontSize: 16,
+    color: colors.white,
   },
-  right: {
+  actionsContainer: {
     flexDirection: 'row',
-    gap: 12,
+    justifyContent: 'flex-end',
   },
-  icon: {
-    width: 32,
-    height: 32,
-    resizeMode: 'contain',
+  acceptButton: {
+    backgroundColor: colors.green,
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: 5,
+    marginRight: 10,
+  },
+  rejectButton: {
+    backgroundColor: colors.red,
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: 5,
+  },
+  buttonText: {
+    fontFamily: fonts.pressStart2P,
+    fontSize: 14,
+    color: colors.white,
   },
 });
