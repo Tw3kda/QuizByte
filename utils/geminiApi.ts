@@ -2,7 +2,7 @@
 
 const ip = process.env.EXPO_PUBLIC_API_IP
 
-const BACKEND_URL = `http://${ip}:3001`; // Asegúrate que esté sin "/" final
+const BACKEND_URL = `https://quiz-byte-api.vercel.app/`; // Asegúrate que esté sin "/" final
 
 type GameResult = {
   name: string;
@@ -22,3 +22,5 @@ export const fetchGeminiImgResponse = async (
   console.log("desde geminiapi.ts " + JSON.stringify(data, null, 2));
   return data.searchResults; // directamente el array de juegos
 };
+
+

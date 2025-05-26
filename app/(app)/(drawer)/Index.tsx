@@ -63,7 +63,10 @@ export default function Index() {
       <WhiteButton
         title="¡Jugar Trivia!"
         color={colors.green}
-        onPress={() => router.push('/(app)/(game)/GameScreen')}
+        onPress={() => router.replace({
+                        pathname: `/(app)/(game)/GameScreen`,
+                        params: { p: "3"},
+                      })}
       />
 
       <WhiteButton

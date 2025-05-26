@@ -1,3 +1,4 @@
+import SplashScreen from "@/app/SplashScreen";
 import { useRouter } from 'expo-router';
 import React, { useContext, useState } from 'react';
 import { Alert, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
@@ -11,14 +12,21 @@ export default function LoginScreen() {
   const [password, setPassword] = useState('');
   const router = useRouter();
   const authContext = useContext(AuthContext);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleLogin = async () => {
+    setIsLoading(true); // Finaliza la carga
+
     if (!authContext) return;
     const success = await authContext.login(email, password);
+        setIsLoading(false); // Finaliza la carga
     if (!success) {
       Alert.alert("Error", "Correo o contraseña incorrectos");
     }
   };
+
+
+   if (isLoading) return <SplashScreen />;
 
   return (
     <View style={styles.container}>

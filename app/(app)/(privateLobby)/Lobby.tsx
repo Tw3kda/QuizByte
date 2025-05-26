@@ -6,16 +6,22 @@ import React, { useContext, useEffect } from "react";
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { LobbyContext } from "../../../contexts/LobbyContext"; // ajusta la ruta si es necesario
 
-
 export default function Lobby() {
   const lobby = useContext(LobbyContext);
- 
 
   if (!lobby) {
     return <Text>Cargando contexto...</Text>;
   }
 
-   const { uid, userName, guestName, lobbyId, createLobby ,setGuestName} = lobby;
+  const {
+    uid,
+    userName,
+    guestName,
+    lobbyId,
+    createLobby,
+    setGuestName,
+    startLobby,
+  } = lobby;
 
   useEffect(() => {
     const create = async () => {
@@ -26,42 +32,41 @@ export default function Lobby() {
     create();
   }, []);
 
-
   useEffect(() => {
-  if (!lobbyId) {
-    console.log("No lobbyId, skipping listener setup");
-    return;
-  }
-
-  console.log("Setting up onSnapshot for lobbyId:", lobbyId);
-  const db = getFirestore();
-  const lobbyRef = doc(db, "lobbies", lobbyId);
-
-  const unsubscribe = onSnapshot(
-    lobbyRef,
-    (docSnap) => {
-      console.log("onSnapshot triggered for lobbyId:", lobbyId);
-      if (docSnap.exists()) {
-        const data = docSnap.data();
-        console.log("Firestore data:", data);
-        const player2 = data.players?.IDplayer2;
-        console.log("Player2 value:", player2);
-        setGuestName(player2 && player2.trim() !== "" ? player2 : "+");
-      } else {
-        console.log("Lobby document does not exist");
-        setGuestName("+");
-      }
-    },
-    (error) => {
-      console.error("Firestore listener error:", error);
+    if (!lobbyId) {
+      console.log("No lobbyId, skipping listener setup");
+      return;
     }
-  );
 
-  return () => {
-    console.log("Cleaning up onSnapshot for lobbyId:", lobbyId);
-    unsubscribe();
-  };
-}, [lobbyId, setGuestName]);
+    console.log("Setting up onSnapshot for lobbyId:", lobbyId);
+    const db = getFirestore();
+    const lobbyRef = doc(db, "lobbies", lobbyId);
+
+    const unsubscribe = onSnapshot(
+      lobbyRef,
+      (docSnap) => {
+        console.log("onSnapshot triggered for lobbyId:", lobbyId);
+        if (docSnap.exists()) {
+          const data = docSnap.data();
+          console.log("Firestore data:", data);
+          const player2 = data.players?.IDplayer2;
+          console.log("Player2 value:", player2);
+          setGuestName(player2 && player2.trim() !== "" ? player2 : "+");
+        } else {
+          console.log("Lobby document does not exist");
+          setGuestName("+");
+        }
+      },
+      (error) => {
+        console.error("Firestore listener error:", error);
+      }
+    );
+
+    return () => {
+      console.log("Cleaning up onSnapshot for lobbyId:", lobbyId);
+      unsubscribe();
+    };
+  }, [lobbyId, setGuestName]);
 
   return (
     <View style={styles.container}>
@@ -111,11 +116,12 @@ export default function Lobby() {
           title="Iniciar partida"
           onPress={() => {
             if (guestName !== "+" && guestName.trim() !== "") {
-            router.replace({
-                      pathname: `/(app)/(game)/GameScreen`,
-                      params: { id: lobbyId , p:1}, 
-                    });
-              console.log("Iniciando partida...");
+              startLobby(); // <-- llama al método aquí
+              router.replace({
+                pathname: `/(app)/(game)/GameScreen`,
+                params: { id: lobbyId , p: "1"},
+              });
+              console.log("Iniciando partida en ID" +lobbyId );
             }
           }}
           color={colors.red}

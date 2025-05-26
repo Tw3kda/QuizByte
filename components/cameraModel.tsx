@@ -1,3 +1,4 @@
+import SplashScreen from "@/app/SplashScreen";
 import { useGemini } from "@/contexts/GeminiContext";
 import { CameraType, CameraView, useCameraPermissions } from "expo-camera";
 import * as FileSystem from "expo-file-system";
@@ -14,6 +15,7 @@ import {
 } from "react-native";
 import colors from "../constants/Colors";
 
+
 export default function CameraScreen({ navigation }: any) {
   const [facing, setFacing] = useState<CameraType>("back");
   const [permission, requestPermission] = useCameraPermissions();
@@ -21,6 +23,7 @@ export default function CameraScreen({ navigation }: any) {
   const [imageBase64, setImageBase64] = useState<string | null>(null); // Store base64 for both camera and gallery images
   const cameraRef = useRef<CameraView>(null);
   const { setImagenUri, enviarImagenAGemini } = useGemini();
+  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const { from } = useLocalSearchParams();
 
@@ -96,42 +99,43 @@ export default function CameraScreen({ navigation }: any) {
   };
 
   const handleButtonPress = async () => {
-  if (!capturedImage || !imageBase64) {
-    Alert.alert(
-      "Error",
-      "No hay imagen capturada o no se pudo cargar. Por favor, intenta de nuevo."
-    );
-    return;
-  }
-
-  const prompt = "QUE VIDEOJUEGO ES LA IMAGEN, DEVUELVEME SOLO EL NOMBRE";
-
-  if (from === "search") {
-    const games = await enviarImagenAGemini(prompt, imageBase64);
-    console.log("Juegos encontrados:", games);
-
-    if (!games || games.length === 0) {
+    setIsLoading(true); // Finaliza la carga
+    if (!capturedImage || !imageBase64) {
       Alert.alert(
         "Error",
-        "No se pudo identificar el videojuego. Intenta con otra imagen."
+        "No hay imagen capturada o no se pudo cargar. Por favor, intenta de nuevo."
       );
       return;
     }
 
-    const game = games[0];
+    const prompt = "QUE VIDEOJUEGO ES LA IMAGEN, DEVUELVEME SOLO EL NOMBRE";
 
-    console.log(game)
+    if (from === "search") {
+      const games = await enviarImagenAGemini(prompt, imageBase64);
+      setIsLoading(false); // Finaliza la carga
+      console.log("Juegos encontrados:", games);
 
-    router.push({
-      pathname: "/confirm",
-      params: {
-        url: game.imageUrl ?? "",
-        titulo: game.name,
-        
-      },
-    });
-  }
-};
+      if (!games || games.length === 0) {
+        Alert.alert(
+          "Error",
+          "No se pudo identificar el videojuego. Intenta con otra imagen."
+        );
+        return;
+      }
+
+      const game = games[0];
+
+      console.log(game);
+
+      router.push({
+        pathname: "/confirm",
+        params: {
+          url: game.imageUrl ?? "",
+          titulo: game.name,
+        },
+      });
+    }
+  };
   if (!permission) return <View />;
   if (!permission.granted) {
     return (
@@ -142,7 +146,7 @@ export default function CameraScreen({ navigation }: any) {
       </View>
     );
   }
-
+  if (isLoading) return <SplashScreen />;
   return (
     <View style={styles.container}>
       {capturedImage ? (

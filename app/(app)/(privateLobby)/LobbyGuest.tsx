@@ -51,6 +51,7 @@ useEffect(() => {
       if (lobbySnap.exists()) {
         setLobby(lobbySnap.data());
         setLobbyId(id);
+        console.log(id)
       } else {
         console.log("Lobby no encontrado");
       }
@@ -67,10 +68,12 @@ useEffect(() => {
       setLobby(data);
 
       if (data.start === true) {
+        
         router.replace({
           pathname: `/(app)/(game)/GameScreen`,
-          params: { id: lobbyId }, // optional: extra param
+          params: { id: id , p: "2"}, 
         });
+        console.log("Iniciando partida en ID" +id );
       }
     }
   });

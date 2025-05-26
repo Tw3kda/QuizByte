@@ -4,9 +4,13 @@ import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import CameraModal from "../../../components/cameraModel";
 import colors from "../../../constants/Colors";
 
+
 export default function CameraScreen({ navigation }: any) {
   const [cameraVisible, setCameraVisible] = useState(false);
   const [imageUri, setImageUri] = useState<string | null>(null);
+   
+
+
 
   return (
     <View style={styles.container}>
@@ -31,6 +35,8 @@ export default function CameraScreen({ navigation }: any) {
       />
     </View>
   );
+
+  
 }
 
 const styles = StyleSheet.create({

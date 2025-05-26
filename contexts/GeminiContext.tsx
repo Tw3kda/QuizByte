@@ -45,7 +45,7 @@ export const GeminiProvider = ({ children }: { children: ReactNode }) => {
 
   const getResponse = async (prompt: string): Promise<string> => {
     try {
-      const res = await fetch(`http://${ip}:3001/geminiText`, {
+      const res = await fetch(`https://quiz-byte-api.vercel.app/geminiText`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

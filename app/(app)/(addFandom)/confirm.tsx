@@ -1,3 +1,4 @@
+import SplashScreen from "@/app/SplashScreen";
 import { db } from "@/utils/FirebaseConfig";
 import { useFonts } from "expo-font";
 import { useLocalSearchParams, useRouter } from "expo-router";
@@ -8,11 +9,11 @@ import { Image, Pressable, StyleSheet, Text, View } from "react-native";
 import colors from "../../../constants/Colors";
 
 export default function SearchScreen() {
-
-    
   const router = useRouter();
   const { titulo, url } = useLocalSearchParams();
   const [imageSize, setImageSize] = useState({ width: 0, height: 0 });
+  const [isLoading, setIsLoading] = useState(true);
+  const [cleanUrl, setCleanUrl] = useState("");
 
   async function addFandomToUser(userId: string, name: any, url: any) {
     const auth = getAuth();
@@ -31,6 +32,7 @@ export default function SearchScreen() {
   }
 
   const handleConfirm = async () => {
+    setIsLoading(true);
     const auth = getAuth();
     const user = auth.currentUser;
 
@@ -41,6 +43,7 @@ export default function SearchScreen() {
 
     if (titulo && url) {
       await addFandomToUser(user.uid, titulo, url);
+      setIsLoading(false); // Finaliza la carga
       router.replace({ pathname: "/Search", params: { reset: "1" } });
     }
   };
@@ -50,30 +53,38 @@ export default function SearchScreen() {
   });
 
   useEffect(() => {
-    if (url) {
-      Image.getSize(
-        String(url),
-        (width, height) => {
-          // Limitamos tamaño si es muy grande
-          const maxSize = 250;
-          const scale = Math.min(maxSize / width, maxSize / height, 1);
-          setImageSize({
-            width: width * scale,
-            height: height * scale,
-          });
-        },
-        (error) => {
-          console.error("Error al obtener tamaño de la imagen", error);
-        }
-      );
-    }
-  }, [url]);
+  if (url) {
+    const cleanUrl = String(url).trim();
+    setCleanUrl(cleanUrl);
+    console.log("Attempting to load image:", cleanUrl);
+    Image.getSize(
+      cleanUrl,
+      (width, height) => {
+        const maxSize = 250;
+        const scale = Math.min(maxSize / width, maxSize / height, 1);
+        setImageSize({
+          width: width * scale,
+          height: height * scale,
+        });
+        console.log("Image size:", { width, height, scaledWidth: width * scale, scaledHeight: height * scale });
+        setIsLoading(false);
+      },
+      (error) => {
+        console.error("Error fetching image size:", error);
+        setImageSize({ width: 250, height: 250 });
+        setIsLoading(false);
+      }
+    );
+  }
+}, [url]);
 
   if (!fontsLoaded) return null;
 
   const handleBack = () => {
     router.back();
   };
+
+  if (isLoading) return <SplashScreen />;
 
   return (
     <View style={styles.container}>
@@ -84,16 +95,18 @@ export default function SearchScreen() {
           style={[
             styles.imageWrapper,
             {
-              width: imageSize.width,
-              height: imageSize.height,
+              width: imageSize.width || 250,
+              height: imageSize.height || 250,
             },
           ]}
         >
-          <Image
-            style={styles.image}
-            source={{ uri: String(url) }}
-            resizeMode="contain"
-          />
+<Image
+  key={cleanUrl}
+  source={{ uri: cleanUrl }}
+  style={{ width: imageSize.width || 250, height: imageSize.height || 250 }}
+  resizeMode="contain"
+  onError={(error) => console.error("Image load error:", error.nativeEvent.error)}
+/>
         </View>
       ) : (
         <Text style={styles.noImageText}>Sin imagen</Text>

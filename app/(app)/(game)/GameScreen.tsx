@@ -2,9 +2,16 @@ import SplashScreen from "@/app/SplashScreen";
 import { useGame } from "@/contexts/GameContext";
 import { useGemini } from "@/contexts/GeminiContext";
 import { LobbyContext } from "@/contexts/LobbyContext";
-import { useLocalSearchParams } from "expo-router";
-import React, { useContext, useEffect, useState } from "react";
-import { Image, Pressable, StyleSheet, Text, View } from "react-native";
+import { router, useFocusEffect, useLocalSearchParams } from "expo-router";
+import React, { useCallback, useContext, useEffect, useState } from "react";
+import {
+  BackHandler,
+  Image,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 import colors from "../../../constants/Colors";
 
 interface Pregunta {
@@ -20,10 +27,13 @@ interface Pregunta {
 
 export default function GameScreen() {
   const lobbyContext = useContext(LobbyContext);
+
+  if (!lobbyContext) {
+    return <Text>Error: LobbyContext no disponible.</Text>;
+  }
+
   const { getResponse } = useGemini();
 
-  
-  
   const [respuesta, setRespuesta] = useState("");
   const [timer, setTimer] = useState(30);
   const [answerColors, setAnswerColors] = useState<{ [key: string]: string }>(
@@ -38,48 +48,84 @@ export default function GameScreen() {
   const [p2, setP2] = useState("");
   const [lobbyId, setLobbyId] = useState("");
   const [isLoading, setIsLoading] = useState(true);
+  const { updateLobbyStats } = useContext(LobbyContext)!;
 
-    if (!lobbyContext) {
-    return <Text>Error: LobbyContext no disponible.</Text>;
-  }
 
-    const { uid, userName } = lobbyContext;
+  useFocusEffect(
+    useCallback(() => {
+      const onBackPress = () => {
+        BackHandler.exitApp(); // Esto envía la app al segundo plano en Android
+        return true;
+      };
 
-  const { id } = useLocalSearchParams();
+      const subscription = BackHandler.addEventListener(
+        "hardwareBackPress",
+        onBackPress
+      );
 
-  const { juegosEnTexto, obtenerJuegosAleatorios, fetchLobbyData, lobbyData } =
-    useGame();
+      return () => subscription.remove(); // 👈 método correcto
+    }, [])
+  );
 
-  useEffect(() => {
-    obtenerJuegosAleatorios(); // esto se ejecuta primero
-  }, []);
-
-  useEffect(() => {
-    if (juegosEnTexto && juegosEnTexto.length > 0) {
-      handleFetch();
-    }
-  }, [juegosEnTexto]);
 
   useEffect(() => {
+  const timer = setTimeout(() => {
+    setIsLoading(false);
+  }, 10000); // 5 segundos
+
+  return () => clearTimeout(timer);
+}, []);
+
+  const {  userName, getPlayersFromLobby } = lobbyContext;
+
+  
+
+  const { id, p } = useLocalSearchParams();
+
+    useEffect(() => {
     const getLobby = async () => {
+      if (!lobbyContext) return;
       if (typeof id === "string") {
-        const lobby = await fetchLobbyData(id);
-        setP1(lobby.player1);
-        setP2(lobby.player2);
-        setLobbyId(lobby.lobbyId);
+        const lobby = await getPlayersFromLobby(id);
+        if (lobby) {
+          setP1(lobby.IDplayer1 ?? "");
+          setP2(lobby.IDplayer2 ?? "");
+        }
       } else {
-        setP1(userName ?? "")
+        setP1(userName ?? "");
       }
     };
-
     getLobby();
-  }, [id]);
+  }, [id, lobbyContext]);
+
+
+  const { juegosEnTexto, obtenerJuegosAleatorios} = useGame();
+ 
+useEffect(() => {
+
+    const cargarPreguntas = async () => {
+      resetEstado();
+      await obtenerJuegosAleatorios();
+    };
+    cargarPreguntas();
+  
+}, [finished]);
+
+  useEffect(() => {
+    if (juegosEnTexto !== "") {
+      handleFetch();
+    }
+
+     
+  }, [juegosEnTexto]);
+
+
 
   const handleFetch = async () => {
     const result = await getResponse(
       "segun estos juegos:" +
         juegosEnTexto +
-        " dame 5 preguntas dificiles con 4 respuesta(diferenciadas A, B, C , D) y la unica respuesta corecta. devuelveme solo un json con clave pregunta y respuestas "
+        " dame 5 preguntas dificiles con 4 respuesta(diferenciadas A, B, C , D) y la unica respuesta corecta, como respuesta correcta dame la letra . devuelveme solo un json con clave pregunta y respuestas "
     );
     console.log("Respuesta de getResponse:", result);
     const cleanResult = result
@@ -95,12 +141,8 @@ export default function GameScreen() {
       setTimer(30);
     } catch (e) {
       console.error("Error al parsear JSON:", e);
-    } finally{
-      setIsLoading(false); // Finaliza la carga
-    }
+    } 
   };
-
-
 
   useEffect(() => {
     if (
@@ -144,27 +186,57 @@ export default function GameScreen() {
     }
   }, [timer, preguntas, preguntaActualIndex]);
 
-  // Handle transition to next question after 2-second delay
   useEffect(() => {
     if (
       (Object.values(answerColors).includes("green") ||
         Object.values(answerColors).includes("red")) &&
       preguntas[preguntaActualIndex]
     ) {
-      const timeout = setTimeout(() => {
+      const timeout = setTimeout(async () => {
         if (preguntaActualIndex < preguntas.length - 1) {
           setPreguntaActualIndex(preguntaActualIndex + 1);
           setAnswerColors({});
           setTimer(30);
         } else {
-          // Handle end of game (e.g., navigate to results screen or show message)
-          console.log("Fin del juego");
+          console.log("Finished all questions");
+          try {
+            if (p === "3") {
+              console.log(
+                "Guest mode (p=3), points:",
+                points,
+                "correctAnswer:",
+                correctAnswer
+              );
+              router.replace({
+                pathname: "/Results",
+                params: {
+                  pointSended: points,
+                  preSended: correctAnswer,
+                  p: "3", // Keep p=3 for consistency
+                },
+              });
+            } else if(p === "1"){
+              await updateDoc();
+            }else if(p === "2"){
+              await updateDoc();
+            }
+          } catch (error) {
+            console.error("Error al actualizar o redirigir:", error);
+            // Fallback navigation
+          }
         }
-      }, 2000); // Wait 2 seconds before moving to the next question
-
+      }, 2000); // 2-second delay before moving on
       return () => clearTimeout(timeout);
     }
-  }, [answerColors, preguntas, preguntaActualIndex]);
+  }, [
+    answerColors,
+    preguntas,
+    preguntaActualIndex,
+    id,
+    p,
+    points,
+    correctAnswer,
+  ]);
 
   const cambiarColorDeRespuesta = (key: "A" | "B" | "C" | "D") => {
     const preguntaActual = preguntas[preguntaActualIndex];
@@ -184,16 +256,105 @@ export default function GameScreen() {
     setAnswerColors(nuevosColores);
 
     if (key === correcta) {
-      setCorrectAnswer((prev) => prev + 1);
       setPoints((prev) => {
         return prev + 100 + 10 * timer;
       });
+      setCorrectAnswer((prev) => prev + 1);
     }
   };
 
-     if (isLoading) return <SplashScreen />;
+  const updateDoc = async () => {
 
+    setIsLoading(true);
+
+    console.log("updateDoc called with:", {
+      p,
+      points,
+      correctAnswer,
+      lobbyId,
+      id,
+    });
+    const effectiveLobbyId = lobbyId || (typeof id === "string" ? id : "");
+    if (!effectiveLobbyId) {
+      console.error("No effective lobbyId provided");
+      return;
+    }
+    try {
+      if (p === "1") {
+        console.log("hola p1");
+        console.log(p)
+        const updates = {
+          PuntosP1: points,
+          p1Finished: true,
+          PreguntasCorrectasP1: correctAnswer,
+          finished: true, 
+          start:false,
+        };
+        console.log(
+          "Sending updates for player 1:",
+          updates,
+          "to lobbyId:",
+          effectiveLobbyId
+        );
+        await updateLobbyStats(effectiveLobbyId, updates);
+      } else if (p === "2") {
+        console.log("hola p2");
+        console.log(p)
+        const updates = {
+          PuntosP2: points,
+          p2Finished: true,
+          PreguntasCorrectasP2: correctAnswer,
+          finished: true, 
+          start:false,
+
+        };
+        console.log(
+          "Sending updates for player 2:",
+          updates,
+          "to lobbyId:",
+          effectiveLobbyId
+        );
+        await updateLobbyStats(effectiveLobbyId, updates);
+      } else {
+        console.warn("Invalid player number:", p);
+      }
+      console.log("updateDoc completed successfully");
+      const idSended = typeof id === "string" ? id : "";
+      console.log("Navigating with idSended:", idSended);
+      if (!idSended) {
+        console.error("No valid lobbyId for navigation");
+        return;
+      }
+router.replace({
+  pathname: "/Results",
+  params: { id: typeof id === "string" ? id : "" },
+});
      
+    } catch (error) {
+      console.error("Error in updateDoc:", error);
+      throw error;
+    }
+        setIsLoading(false);
+
+  };
+
+  const resetEstado = () => {
+    setRespuesta("");
+    setTimer(30);
+    setAnswerColors({});
+    setPreguntas([]);
+    setPreguntaActualIndex(0);
+    setCorrectAnswer(0);
+    setFinished(false);
+    setPoints(0);
+    setP1("");
+    setP2("");
+    setLobbyId("");
+    setIsLoading(true);
+  };
+
+  if (isLoading) return <SplashScreen />;
+
   return (
     <View style={styles.container}>
       <View style={styles.nameContainer}>

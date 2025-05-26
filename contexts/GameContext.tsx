@@ -8,6 +8,7 @@ interface GameContextType {
   obtenerJuegosAleatorios: () => Promise<void>;
   lobbyData: any;
   fetchLobbyData: (lobbyId: string) => Promise<any>;
+    resetGameState: () => void; // ← Nueva función
 }
 
 const GameContext = createContext<GameContextType | undefined>(undefined);
@@ -75,9 +76,15 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  const resetGameState = () => {
+  setJuegosEnTexto("");
+  setLobbyData(null);
+};
+
+
   return (
     <GameContext.Provider
-      value={{ juegosEnTexto, obtenerJuegosAleatorios, lobbyData, fetchLobbyData }}
+      value={{ juegosEnTexto, obtenerJuegosAleatorios, lobbyData, fetchLobbyData , resetGameState}}
     >
       {children}
     </GameContext.Provider>
