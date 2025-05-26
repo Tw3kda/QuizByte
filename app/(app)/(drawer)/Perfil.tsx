@@ -63,10 +63,12 @@ setFandoms(fandomsArray);
           <Pressable onPress={() => navigation.openDrawer()} style={styles.menuButton}>
             <Text style={styles.menuIcon}>☰</Text>
           </Pressable>
-          <View style={styles.titleRow}>
+          <View style={styles.titleContainer}> {/* Nuevo contenedor para el título */}
             <Text style={styles.title}>Holaa {userName}</Text>
-            <Image source={require('../../../assets/images/User.png')} style={styles.userIcon} />
           </View>
+          <View style={styles.userIconContainer}> {/* Nuevo contenedor para el icono */}
+            <Image source={require('../../../assets/images/User.png')} style={styles.userIcon} />
+            </View>
         </View>
 
         <View style={styles.statsContainer}>
@@ -131,6 +133,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#111721',
+    paddingTop: 45,
   },
   scrollContent: {
     flexGrow: 1,
@@ -220,6 +223,7 @@ const styles = StyleSheet.create({
     height: 32,
     resizeMode: 'contain',
   },
+
   containerResult: {
     flexDirection: 'row',
     gap: 20,
@@ -245,5 +249,13 @@ const styles = StyleSheet.create({
     fontSize: 10,
     color: colors.white,
     textAlign: 'center',
+
+  titleContainer: { 
+    flex: 1,
+    alignItems: 'center', // Centramos el título dentro de su contenedor
+  },
+  userIconContainer: {
+    alignItems: 'center',
+
   },
 });

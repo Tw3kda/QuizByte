@@ -4,7 +4,7 @@ import { useRouter } from 'expo-router';
 import { getAuth } from 'firebase/auth';
 import { doc, getDoc, getFirestore } from 'firebase/firestore';
 import React, { useEffect, useState } from 'react';
-import { ImageBackground, Pressable, ScrollView, StyleSheet, Text, View, } from 'react-native';
+import { ImageBackground, Pressable, StyleSheet, Text, View } from 'react-native';
 import WhiteButton from '../../../components/whiteButton';
 import colors from '../../../constants/Colors';
 import fonts from '../../../constants/fonts';
@@ -58,7 +58,7 @@ export default function Index() {
       </View>
     </View>
 
-    <ScrollView contentContainerStyle={styles.scrollContent}>
+    <View style={styles.scrollContent}>
 
       <WhiteButton
         title="¡Jugar Trivia!"
@@ -86,7 +86,7 @@ export default function Index() {
         color={colors.pink}
         onPress={() => router.push('/(app)/(addFandom)/Search')}
       />
-    </ScrollView>
+    </View>
   </View>
 );
 
@@ -112,7 +112,7 @@ const styles = StyleSheet.create({
     height: '100%',
   },
   scrollContent: {
-  flexGrow: 1,
+  flex: 1,
   justifyContent: 'center', // Centrado vertical
   alignItems: 'center',     // Centrado horizontal
   paddingHorizontal: 20,
