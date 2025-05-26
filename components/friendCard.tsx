@@ -1,5 +1,3 @@
-// 📁 components/FriendCard.tsx
-
 import colors from '@/constants/Colors';
 import fonts from '@/constants/fonts';
 import React from 'react';
@@ -16,14 +14,8 @@ interface FriendCardProps {
   onAction?: () => void;
 }
 
-const FriendCard: React.FC<FriendCardProps> = ({
-  name,
-  score,
-  onInvite,
-  onDelete,
-  actionLabel,
-  onAction,
-}) => {
+const FriendCard: React.FC<FriendCardProps> = ({ name, score, onInvite, onDelete, actionLabel, onAction,}) => {
+  
   return (
     <View style={styles.card}>
       <View style={styles.infoRow}>
@@ -71,68 +63,78 @@ const FriendCard: React.FC<FriendCardProps> = ({
 
 export default FriendCard;
 
+// ... (resto del FriendCard igual)
+
 const styles = StyleSheet.create({
   card: {
     backgroundColor: colors.grayDark,
     padding: 12,
-    width: '100%',
+    width: 'auto',
   },
   infoRow: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'flex-start',
+    marginBottom: 12,
+    gap: 15,
   },
   avatar: {
     width: 40,
     height: 40,
-    marginRight: 12,
+    marginRight: 8,
+    marginLeft: 8,
   },
   nameScoreContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 60,
     flex: 1,
   },
   name: {
     fontFamily: fonts.pressStart2P,
-    fontSize: 12,
+    fontSize: 16,
     color: colors.white,
-    marginBottom: 4,
+    flexShrink: 1,
   },
   scoreRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 5,
+    gap: 4,
   },
   trophy: {
-    width: 16,
-    height: 16,
+    width: 25,
+    height: 25,
+    marginRight: 8,
   },
   score: {
     fontFamily: fonts.pressStart2P,
-    fontSize: 12,
+    fontSize: 16,
     color: colors.purple,
   },
   actionsContainer: {
     flexDirection: 'row',
+    justifyContent: 'center',
     alignItems: 'center',
-    justifyContent: 'space-between',
-    marginTop: 12,
+    gap: 16,
   },
   inviteButton: {
-    paddingVertical: 8,
-    paddingHorizontal: 16,
+    paddingVertical: 6,
+    paddingHorizontal: 12,
     borderWidth: 2,
     borderColor: colors.orange,
     backgroundColor: colors.orange,
   },
   inviteText: {
     fontFamily: fonts.pressStart2P,
-    fontSize: 12,
+    fontSize: 10,
     color: colors.white,
   },
   trashButton: {
-    padding: 5,
+    padding: 4,
   },
   trashIcon: {
-    width: 32,
-    height: 32,
+    width: 28,
+    height: 28,
     tintColor: colors.red,
   },
   actionButton: {
@@ -140,7 +142,7 @@ const styles = StyleSheet.create({
   },
   actionText: {
     fontFamily: fonts.pressStart2P,
-    fontSize: 12,
+    fontSize: 10,
     color: colors.purple,
   },
 });

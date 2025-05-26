@@ -1,10 +1,12 @@
 // 📦 Imports
-import { FriendMap } from '@/interfaces/common';
+import { FriendData } from '@/interfaces/common';
 import { DrawerNavigationProp } from '@react-navigation/drawer';
 import { useNavigation } from '@react-navigation/native';
+import * as Notifications from 'expo-notifications';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
-import { Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Alert, Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { useNotification } from '../../../contexts/NotifcationContext';
 
 // 🧠 Contexts
 import { useFriends } from '@/contexts/FriendsContext';
@@ -20,16 +22,10 @@ import colors from '@/constants/Colors';
 import fonts from '@/constants/fonts';
 
 export default function Amigos() {
+  const { expoPushToken, notification } = useNotification();
   const [searchText, setSearchText] = useState('');
-  const [searchResult, setSearchResult] = useState<FriendMap | null>(null);
-
-  const {
-    friends,
-    friendRequests,
-    searchUser,
-    sendFriendRequest,
-    handleRequest,
-  } = useFriends();
+  const [searchResult, setSearchResult] = useState<FriendData | null>(null);
+  const { friends, friendRequests, searchUser, sendFriendRequest, handleRequest, removeFriend} = useFriends();
 
   const router = useRouter();
   const navigation = useNavigation<DrawerNavigationProp<{}>>();
@@ -50,16 +46,45 @@ export default function Amigos() {
   };
 
   // ✉️ Invitar a jugar
-  const sendInvitation = (id: string) => {
+  const sendInvitation = async (id: string, name: string) => {
     console.log('Invitación enviada a', id);
-    // TODO: lógica de notificación
+    await Notifications.scheduleNotificationAsync({
+      content: {
+        title: ' 👾 Invitación a lobby',
+        body: 'Has invitado al jugador $(name) a unirse a tu lobby',
+        data: { extraData: '⭐⚔️' },
+      },
+      trigger: {
+            type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
+            seconds: 2,
+          },
+      }
+    )
+
+
   };
 
   // 🗑️ Eliminar amigo
-  const removeFriend = (id: string) => {
-    console.log('Eliminar amigo', id);
-    // TODO: lógica de eliminar
-  };
+  const DeleteFriend = (id: string) => {
+  Alert.alert(
+    "Eliminar amigo",
+    "¿Estás seguro de que querés eliminar a este amigo?",
+    [
+      { text: "Cancelar", style: "cancel" },
+      {
+        text: "Eliminar",
+        style: "destructive",
+        onPress: () => {
+          removeFriend(id);
+          setSearchResult(null);
+          console.log('Amigo eliminado', id);
+        },
+      },
+    ]
+  );
+};
+
+
 
   return (
     <View style={styles.container}>
@@ -109,13 +134,14 @@ export default function Amigos() {
           <FriendCard
             id={searchResult.id}
             name={searchResult.name}
-            score={searchResult.stats?.[0]}
+            score={searchResult.score}
             onInvite={() => {}}
             onDelete={() => {}}
             actionLabel="Enviar solicitud"
             onAction={handleSendRequest}
           />
-        )}
+        )}      
+
 
         {/* 👬 Lista de amigos */}
         {friends.length === 0 ? (
@@ -127,8 +153,8 @@ export default function Amigos() {
               id={friend.id}
               name={friend.name}
               score={friend.score}
-              onInvite={() => sendInvitation(friend.id)}
-              onDelete={() => removeFriend(friend.id)}
+              onInvite={() => sendInvitation(friend.id, friend.name)}
+              onDelete={() => DeleteFriend(friend.id)}
             />
           ))
         )}
@@ -144,8 +170,8 @@ export default function Amigos() {
             key={request.id}
             id={request.id}
             name={request.name}
-            onAccept={() => handleRequest(request.id, 'accept')}
-            onReject={() => handleRequest(request.id, 'reject')}
+            onAccept={() => { handleRequest(request.id, "accept"); }}
+            onReject={() => { handleRequest(request.id, 'reject'); }}
           />
         ))}
 
@@ -230,3 +256,4 @@ const styles = StyleSheet.create({
     resizeMode: 'contain',
   },
 });
+

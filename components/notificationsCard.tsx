@@ -15,18 +15,35 @@ export default function NotificationCard({ type, message, timestamp }: {
   timestamp: any;
 }) {
   const formatDate = (ts: any) => {
-    if (!ts) return '';
-    const date = ts.toDate();
-    const now = new Date();
+  if (!ts) return '';
+  const date = ts.toDate();
+  const now = new Date();
 
-    const diff = Math.floor((now.getTime() - date.getTime()) / 60000);
+  const diffMinutes = Math.floor((now.getTime() - date.getTime()) / 60000);
+  const diffDays = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24));
 
-    if (diff < 60) return `Hace ${diff} min`;
-    if (now.toDateString() === date.toDateString()) {
-      return `Hoy ${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
-    }
-    return 'Ayer';
-  };
+  const hours = date.getHours().toString().padStart(2, '0');
+  const minutes = date.getMinutes().toString().padStart(2, '0');
+  const timeString = `${hours}:${minutes}`;
+
+  if (diffMinutes < 60) return `Hace ${diffMinutes} min`;
+
+  const today = now.toDateString();
+  const yesterday = new Date(now);
+  yesterday.setDate(now.getDate() - 1);
+
+  if (date.toDateString() === today) {
+    return `Hoy ${timeString}`;
+  } else if (date.toDateString() === yesterday.toDateString()) {
+    return `Ayer ${timeString}`;
+  } else {
+    const day = date.getDate().toString().padStart(2, '0');
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const year = date.getFullYear();
+    return `${day}/${month}/${year} ${timeString}`;
+  }
+};
+
 
   return (
    <View style={styles.card}>
@@ -81,7 +98,7 @@ const styles = StyleSheet.create({
   },
   time: {
     fontFamily: fonts.pressStart2P,
-    fontSize: 15,
+    fontSize: 12,
     color: colors.pink,
     marginBottom: 2,
   },

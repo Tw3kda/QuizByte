@@ -19,20 +19,28 @@ const FriendRequestCard: React.FC<FriendRequestCardProps> = ({
 }) => {
   return (
     <View style={styles.card}>
-      <View style={styles.infoContainer}>
-        <Image
-          source={require('@/assets/images/User.png')}
-          style={styles.avatar}
-        />
-        <Text style={styles.name}>{name}</Text>
-      </View>
-      <View style={styles.actionsContainer}>
-        <Pressable onPress={onAccept} style={styles.acceptButton}>
-          <Text style={styles.buttonText}>Aceptar</Text>
-        </Pressable>
-        <Pressable onPress={onReject} style={styles.rejectButton}>
-          <Text style={styles.buttonText}>Rechazar</Text>
-        </Pressable>
+      <View style={styles.contentRow}>
+        <View style={styles.infoContainer}>
+          <Image
+            source={require('@/assets/images/User.png')}
+            style={styles.avatar}
+          />
+          <Text style={styles.name}>{name}</Text>
+        </View>
+        <View style={styles.actionsContainer}>
+          <Pressable onPress={onAccept} style={styles.iconButton}>
+            <Image
+              source={require('@/assets/images/Accept.png')}
+              style={styles.Accepticon}
+            />
+          </Pressable>
+          <Pressable onPress={onReject} style={styles.iconButton}>
+            <Image
+              source={require('@/assets/images/Decline.png')}
+              style={styles.Declineicon}
+            />
+          </Pressable>
+        </View>
       </View>
     </View>
   );
@@ -43,25 +51,24 @@ export default FriendRequestCard;
 const styles = StyleSheet.create({
   card: {
     backgroundColor: colors.grayDark,
-    padding: 15,
-    marginVertical: 10,
+    padding: 20,
     width: '100%',
-    shadowColor: colors.black,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 5,
-    elevation: 3,
+    marginVertical: 5,
+  },
+  contentRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
   },
   infoContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 10,
+    gap: 5,
   },
   avatar: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    marginRight: 15,
+    width: 40,
+    height: 40,
+    marginRight: 20,
   },
   name: {
     fontFamily: fonts.pressStart2P,
@@ -70,24 +77,20 @@ const styles = StyleSheet.create({
   },
   actionsContainer: {
     flexDirection: 'row',
-    justifyContent: 'flex-end',
+    alignItems: 'center',
+    gap: 5,
   },
-  acceptButton: {
-    backgroundColor: colors.green,
-    paddingVertical: 6,
-    paddingHorizontal: 12,
-    borderRadius: 5,
-    marginRight: 10,
+  iconButton: {
+    padding: 5,
   },
-  rejectButton: {
-    backgroundColor: colors.red,
-    paddingVertical: 6,
-    paddingHorizontal: 12,
-    borderRadius: 5,
+  Accepticon: {
+    width: 40,
+    height: 40,
+    tintColor: colors.green,
   },
-  buttonText: {
-    fontFamily: fonts.pressStart2P,
-    fontSize: 14,
-    color: colors.white,
+  Declineicon: {
+    width: 40,
+    height: 40,
+    tintColor: colors.red,
   },
 });

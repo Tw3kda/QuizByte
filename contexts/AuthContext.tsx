@@ -66,14 +66,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         email,
         name,
         fandoms: {},
-        friends: {
-          id: "",
-          name: ""
-        },
-        friendRequests: {
-          id: "",
-          name: ""
-        },
+        friends: {},
+        friendRequests: {},
         stats: [0, 0, 0],
       };
 
