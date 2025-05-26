@@ -2,7 +2,7 @@
 
 const ip = process.env.EXPO_PUBLIC_API_IP
 
-const BACKEND_URL = `https://quiz-byte-api.vercel.app/`; // Asegúrate que esté sin "/" final
+// Asegúrate que esté sin "/" final
 
 type GameResult = {
   name: string;
@@ -12,15 +12,21 @@ type GameResult = {
 export const fetchGeminiImgResponse = async (
   request: { prompt: string; imageBase64: string }
 ): Promise<GameResult[]> => {
-  const response = await fetch(`${BACKEND_URL}/gemini-vision`, {
+  const response = await fetch(`https://quiz-byte-api.vercel.app/gemini-vision`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(request),
   });
 
-  const data = await response.json();
-  console.log("desde geminiapi.ts " + JSON.stringify(data, null, 2));
-  return data.searchResults; // directamente el array de juegos
+  const text = await response.text(); // obtener la respuesta como texto
+  console.log("Respuesta cruda del backend:", text);
+
+  try {
+    const data = JSON.parse(text);
+    console.log("Parsed JSON:", JSON.stringify(data, null, 2));
+    return data.searchResults;
+  } catch (err) {
+    console.error("No se pudo parsear JSON:", err);
+    throw err;
+  }
 };
-
-

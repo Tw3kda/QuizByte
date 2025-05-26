@@ -24,7 +24,7 @@ export const FandomProvider: React.FC<{ children: React.ReactNode }> = ({
     setError(null);
 
     try {
-      const response = await fetch(`http://${ip}:3001/search`, {
+      const response = await fetch(`https://quiz-byte-api.vercel.app/search`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

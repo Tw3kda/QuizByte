@@ -23,6 +23,7 @@ type LobbyContextType = {
   createLobby: () => Promise<string | undefined>;
   setGuestName: React.Dispatch<React.SetStateAction<string>>;
   startLobby: () => Promise<void>;
+  
   updateLobbyStats: (
     lobbyId0: string,
     updates: {
@@ -41,6 +42,20 @@ type LobbyContextType = {
     IDplayer1: string | null;
     IDplayer2: string | null;
   } | null>;
+
+  getLobbyStats: (lobbyId: string) => Promise<{
+  PreguntasCorrectasP1: number;
+  PreguntasCorrectasP2: number;
+  PuntosP1: number;
+  PuntosP2: number;
+  p1Finished: boolean;
+  p2Finished: boolean;
+  finished: boolean;
+  start: boolean;
+  host: string;
+  IDplayer1: string;
+  IDplayer2: string;
+} | null>;
 };
 
 type LobbyProviderProps = {
@@ -305,23 +320,75 @@ export const LobbyProvider: React.FC<LobbyProviderProps> = ({ children }) => {
     }
   };
 
-  return (
-    <LobbyContext.Provider
-      value={{
-        userName,
-        uid,
-        guestName,
-        lobbyId,
-        lobbyId0: lobbyId,
-        setLobbyId,
-        createLobby,
-        setGuestName,
-        startLobby,
-        updateLobbyStats,
-        getPlayersFromLobby,
-      }}
-    >
-      {children}
-    </LobbyContext.Provider>
-  );
+  const getLobbyStats = async (lobbyId: string): Promise<{
+  PreguntasCorrectasP1: number;
+  PreguntasCorrectasP2: number;
+  PuntosP1: number;
+  PuntosP2: number;
+  p1Finished: boolean;
+  p2Finished: boolean;
+  finished: boolean;
+  start: boolean;
+  host: string;
+  IDplayer1: string;
+  IDplayer2: string;
+} | null> => {
+  if (!lobbyId) {
+    console.warn("No se proporcionó un ID de lobby");
+    return null;
+  }
+
+  const db = getFirestore();
+  const lobbyRef = doc(db, "lobbies", lobbyId);
+
+  try {
+    const lobbySnap = await getDoc(lobbyRef);
+    if (!lobbySnap.exists()) {
+      console.warn("El lobby no existe para el ID:", lobbyId);
+      return null;
+    }
+
+    const data = lobbySnap.data();
+    const stats = data.Stats || {};
+    const players = data.players || {};
+
+    return {
+      PreguntasCorrectasP1: stats.PreguntasCorrectasP1 ?? 0,
+      PreguntasCorrectasP2: stats.PreguntasCorrectasP2 ?? 0,
+      PuntosP1: stats.PuntosP1 ?? 0,
+      PuntosP2: stats.PuntosP2 ?? 0,
+      p1Finished: stats.p1Finished ?? false,
+      p2Finished: stats.p2Finished ?? false,
+      finished: stats.finished ?? false,
+      start: data.start ?? false,
+      host: data.host ?? "",
+      IDplayer1: players.IDplayer1 ?? "",
+      IDplayer2: players.IDplayer2 ?? "",
+    };
+  } catch (error) {
+    console.error("Error al obtener estadísticas del lobby:", error);
+    return null;
+  }
+};
+
+return (
+  <LobbyContext.Provider
+    value={{
+      uid,
+      userName,
+      guestName,
+      lobbyId,
+      lobbyId0: lobbyId, // Aquí parece que `lobbyId0` es igual a `lobbyId`
+      setLobbyId,
+      createLobby,
+      setGuestName,
+      startLobby,
+      updateLobbyStats,
+      getPlayersFromLobby,
+      getLobbyStats,
+    }}
+  >
+    {children}
+  </LobbyContext.Provider>
+);
 };

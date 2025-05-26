@@ -10,10 +10,12 @@ import fonts from '../../../constants/fonts';
 export default function Index() {
   const [userName, setUserName] = useState('Cargando...');
   const [stats, setStats] = useState<number[]>([0, 0, 0]);
+  const [fandoms, setFandoms] = useState<{ name: string; url: string }[]>([]);
   const navigation = useNavigation<DrawerNavigationProp<{}>>();
 
+
   useEffect(() => {
-    const fetchUserName = async () => {
+    const fetchUserData = async () => {
       try {
         const auth = getAuth();
         const user = auth.currentUser;
@@ -27,26 +29,36 @@ export default function Index() {
           const userData = userSnap.data();
           setUserName(userData.name || 'Jugador');
 
-          const puntaje = userData.stats[0] || 0;
-          const trivias = userData.stats[1] || 0;
-          const ranking = userData.stats[2] || 0;
+          const puntaje = userData.stats?.[0] || 0;
+          const trivias = userData.stats?.[1] || 0;
+          const ranking = userData.stats?.[2] || 0;
           setStats([puntaje, trivias, ranking]);
+
+          // Obtener fandoms
+          const fandomsMap = userData.fandoms || {};
+const fandomsArray = Object.values(fandomsMap) as { name: string; url: string }[];
+setFandoms(fandomsArray);
+
         } else {
           setUserName('Jugador');
         }
       } catch (error) {
-        console.error('Error obteniendo el nombre y sus datos', error);
+        console.error('Error obteniendo los datos del usuario', error);
         setUserName('Jugador');
       }
     };
 
-    fetchUserName();
+    fetchUserData();
   }, []);
+
+  const handlePress = (item: { name: string; url: string }) => {
+    // Aquí puedes agregar navegación u otra lógica
+    console.log('Fandom seleccionado:', item.name);
+  };
 
   return (
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
-
         <View style={styles.header}>
           <Pressable onPress={() => navigation.openDrawer()} style={styles.menuButton}>
             <Text style={styles.menuIcon}>☰</Text>
@@ -79,7 +91,36 @@ export default function Index() {
             <Image source={require('../../../assets/images/Badge.png')} style={styles.sectionIcon} />
           </View>
 
-          <Text style={styles.sagasText}>Aquí irán tus sagas favoritas... 👀</Text>
+          {fandoms.length === 0 ? (
+            <Text style={styles.sagasText}>Aquí irán tus sagas favoritas... 👀</Text>
+          ) : (
+            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+              <View style={styles.containerResult}>
+                {fandoms.map((item, index) => (
+                  <Pressable key={index} onPress={() => handlePress(item)}>
+                    <View style={styles.cardContainer}>
+                      {item.url ? (
+                        <Image
+                          style={styles.image}
+                          source={{ uri: item.url }}
+                          resizeMode="contain"
+                        />
+                      ) : (
+                        <Text style={styles.noImageText}>Sin imagen</Text>
+                      )}
+                      <Text
+                        style={styles.name}
+                        numberOfLines={2}
+                        ellipsizeMode="tail"
+                      >
+                        {item.name}
+                      </Text>
+                    </View>
+                  </Pressable>
+                ))}
+              </View>
+            </ScrollView>
+          )}
         </View>
       </ScrollView>
     </View>
@@ -178,5 +219,31 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     resizeMode: 'contain',
+  },
+  containerResult: {
+    flexDirection: 'row',
+    gap: 20,
+  },
+  cardContainer: {
+    width: 120,
+    alignItems: 'center',
+    backgroundColor: colors.grayDark,
+    borderRadius: 10,
+    padding: 10,
+  },
+  image: {
+    width: 90,
+    height: 120,
+    marginBottom: 10,
+  },
+  noImageText: {
+    color: colors.gray,
+    fontSize: 12,
+  },
+  name: {
+    fontFamily: fonts.pressStart2P,
+    fontSize: 10,
+    color: colors.white,
+    textAlign: 'center',
   },
 });

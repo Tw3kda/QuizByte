@@ -60,7 +60,7 @@ export default function CameraScreen({ navigation }: any) {
 
   const take = async () => {
     const result = await cameraRef.current?.takePictureAsync({
-      quality: 1,
+      quality: 0.1,
       base64: true,
     });
 

@@ -50,7 +50,6 @@ export default function GameScreen() {
   const [isLoading, setIsLoading] = useState(true);
   const { updateLobbyStats } = useContext(LobbyContext)!;
 
-
   useFocusEffect(
     useCallback(() => {
       const onBackPress = () => {
@@ -67,22 +66,19 @@ export default function GameScreen() {
     }, [])
   );
 
-
   useEffect(() => {
-  const timer = setTimeout(() => {
-    setIsLoading(false);
-  }, 10000); // 5 segundos
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 15000); // 5 segundos
 
-  return () => clearTimeout(timer);
-}, []);
+    return () => clearTimeout(timer);
+  }, []);
 
-  const {  userName, getPlayersFromLobby } = lobbyContext;
-
-  
+  const { userName, getPlayersFromLobby } = lobbyContext;
 
   const { id, p } = useLocalSearchParams();
 
-    useEffect(() => {
+  useEffect(() => {
     const getLobby = async () => {
       if (!lobbyContext) return;
       if (typeof id === "string") {
@@ -98,28 +94,21 @@ export default function GameScreen() {
     getLobby();
   }, [id, lobbyContext]);
 
+  const { juegosEnTexto, obtenerJuegosAleatorios } = useGame();
 
-  const { juegosEnTexto, obtenerJuegosAleatorios} = useGame();
- 
-useEffect(() => {
-
+  useEffect(() => {
     const cargarPreguntas = async () => {
       resetEstado();
       await obtenerJuegosAleatorios();
     };
     cargarPreguntas();
-  
-}, [finished]);
+  }, [finished]);
 
   useEffect(() => {
     if (juegosEnTexto !== "") {
       handleFetch();
     }
-
-     
   }, [juegosEnTexto]);
-
-
 
   const handleFetch = async () => {
     const result = await getResponse(
@@ -139,9 +128,10 @@ useEffect(() => {
       setPreguntaActualIndex(0); // Reinicia la pregunta actual al cargar nuevas
       setAnswerColors({});
       setTimer(30);
+      
     } catch (e) {
       console.error("Error al parsear JSON:", e);
-    } 
+    }
   };
 
   useEffect(() => {
@@ -208,16 +198,17 @@ useEffect(() => {
                 correctAnswer
               );
               router.replace({
-                pathname: "/Results",
+                pathname: "/Results3",
                 params: {
                   pointSended: points,
                   preSended: correctAnswer,
-                  p: "3", // Keep p=3 for consistency
+                  p: "3", 
+                  userName// Keep p=3 for consistency
                 },
               });
-            } else if(p === "1"){
+            } else if (p === "1") {
               await updateDoc();
-            }else if(p === "2"){
+            } else if (p === "2") {
               await updateDoc();
             }
           } catch (error) {
@@ -264,7 +255,6 @@ useEffect(() => {
   };
 
   const updateDoc = async () => {
-
     setIsLoading(true);
 
     console.log("updateDoc called with:", {
@@ -282,13 +272,13 @@ useEffect(() => {
     try {
       if (p === "1") {
         console.log("hola p1");
-        console.log(p)
+        console.log(p);
         const updates = {
           PuntosP1: points,
           p1Finished: true,
           PreguntasCorrectasP1: correctAnswer,
-          finished: true, 
-          start:false,
+          finished: true,
+          start: false,
         };
         console.log(
           "Sending updates for player 1:",
@@ -299,14 +289,13 @@ useEffect(() => {
         await updateLobbyStats(effectiveLobbyId, updates);
       } else if (p === "2") {
         console.log("hola p2");
-        console.log(p)
+        console.log(p);
         const updates = {
           PuntosP2: points,
           p2Finished: true,
           PreguntasCorrectasP2: correctAnswer,
-          finished: true, 
-          start:false,
-
+          finished: true,
+          start: false,
         };
         console.log(
           "Sending updates for player 2:",
@@ -325,35 +314,35 @@ useEffect(() => {
         console.error("No valid lobbyId for navigation");
         return;
       }
-router.replace({
-  pathname: "/Results",
-  params: { id: typeof id === "string" ? id : "" },
-});
-     
+
+      
+      router.replace({
+        pathname: "/Results2",
+        params: { id: typeof id === "string" ? id : "" , p},
+      });
     } catch (error) {
       console.error("Error in updateDoc:", error);
       throw error;
     }
-        setIsLoading(false);
-
+    setIsLoading(false);
   };
 
   const resetEstado = () => {
     setRespuesta("");
     setTimer(30);
     setAnswerColors({});
-    setPreguntas([]);
     setPreguntaActualIndex(0);
     setCorrectAnswer(0);
     setFinished(false);
     setPoints(0);
-    setP1("");
     setP2("");
     setLobbyId("");
     setIsLoading(true);
   };
 
-  if (isLoading) return <SplashScreen />;
+  if (isLoading) {
+    return <SplashScreen />;
+  }
 
   return (
     <View style={styles.container}>
