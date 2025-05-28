@@ -91,12 +91,15 @@ const styles = StyleSheet.create({
   menu: {
     flex: 1,
     paddingHorizontal: 10,
+  
+    
   },
   item: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingVertical: 14,
     gap: 10,
+    width:"100 %"
   },
   icon: {
     width: 20,
@@ -112,6 +115,7 @@ const styles = StyleSheet.create({
     padding: 20,
     borderTopWidth: 1,
     borderTopColor: colors.white,
+    
   },
   username: {
     color: colors.white,

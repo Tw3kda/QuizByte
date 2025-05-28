@@ -1,128 +1,135 @@
-import colors from '@/constants/Colors';
-import { DrawerNavigationProp } from '@react-navigation/drawer';
-import { useNavigation } from '@react-navigation/native';
-import { getAuth } from 'firebase/auth';
-import { doc, getDoc, getFirestore } from 'firebase/firestore';
-import React, { useEffect, useState } from 'react';
-import { Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
-import fonts from '../../../constants/fonts';
+import { useFonts } from "expo-font";
+import { useRouter } from "expo-router";
+import React, { useState } from "react";
+import {
+  Image,
+  Pressable,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import { ScrollView } from "react-native-gesture-handler";
+import colors from "../../../constants/Colors";
+import { useFandom } from "../../../contexts/FandomContext"; // 👈 import the hook
 
-export default function Index() {
-  const [userName, setUserName] = useState('Cargando...');
-  const [stats, setStats] = useState<number[]>([0, 0, 0]);
-  const [fandoms, setFandoms] = useState<{ name: string; url: string }[]>([]);
-  const navigation = useNavigation<DrawerNavigationProp<{}>>();
+
+export default function SearchScreen() {
+  const { results, isLoading, error, fetchFandoms, clearResults } = useFandom();
+  const [searchTerm, setSearchTerm] = useState("");
+  const router = useRouter();
 
 
-  useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        const auth = getAuth();
-        const user = auth.currentUser;
-        if (!user) return;
-
-        const firestore = getFirestore();
-        const userRef = doc(firestore, 'users', user.uid);
-        const userSnap = await getDoc(userRef);
-
-        if (userSnap.exists()) {
-          const userData = userSnap.data();
-          setUserName(userData.name || 'Jugador');
-
-          const puntaje = userData.stats?.[0] || 0;
-          const trivias = userData.stats?.[1] || 0;
-          const ranking = userData.stats?.[2] || 0;
-          setStats([puntaje, trivias, ranking]);
-
-          // Obtener fandoms
-          const fandomsMap = userData.fandoms || {};
-const fandomsArray = Object.values(fandomsMap) as { name: string; url: string }[];
-setFandoms(fandomsArray);
-
-        } else {
-          setUserName('Jugador');
-        }
-      } catch (error) {
-        console.error('Error obteniendo los datos del usuario', error);
-        setUserName('Jugador');
-      }
-    };
-
-    fetchUserData();
-  }, []);
-
-  const handlePress = (item: { name: string; url: string }) => {
-    // Aquí puedes agregar navegación u otra lógica
-    console.log('Fandom seleccionado:', item.name);
+  const handlePress = (item: { name: string; imageUrl: string }) => {
+    setSearchTerm("");
+    clearResults();
+    router.push({
+      pathname: "/confirm",
+      params: {
+        titulo: item.name,
+        url: item.imageUrl ?? "",
+      },
+    });
   };
 
+  const [fontsLoaded] = useFonts({
+    "PressStart2P-Regular": require("../../../assets/fonts/PressStart2P-Regular.ttf"),
+  });
+
+  const handleSearch = () => {
+    if (searchTerm.trim()) {
+      fetchFandoms(searchTerm);
+    }
+  };
+
+  const handleCamera = () => {
+    router.push({
+  pathname: "/camera",
+  params: { from: "search" },
+});
+  };
+
+  if (!fontsLoaded) return null;
+
   return (
+
+    
     <View style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        <View style={styles.header}>
-          <Pressable onPress={() => navigation.openDrawer()} style={styles.menuButton}>
-            <Text style={styles.menuIcon}>☰</Text>
-          </Pressable>
-          <View style={styles.titleRow}>
-            <Text style={styles.title}>Holaa {userName}</Text>
-            <Image source={require('../../../assets/images/User.png')} style={styles.userIcon} />
+
+      <View style={styles.containerTitle}>
+        <TouchableOpacity onPress={()=>router.push("/Index")}>
+                  <Image
+                    source={require("../../../assets/images/Back.png")}
+                    style={styles.backButton}
+                  />
+        </TouchableOpacity>
+                
+        <Text style={styles.title}>Agregar fandom</Text>
+      </View>
+
+      <View style={styles.manualSearchContainer}>
+        <Text style={styles.secondTitle}>Búsqueda Manual</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="ingrese fandom"
+          placeholderTextColor={colors.grayLight}
+          value={searchTerm}
+          onChangeText={setSearchTerm}
+          onSubmitEditing={handleSearch}
+        />
+
+        {/* Botón visual */}
+        <Pressable onPress={handleSearch} style={styles.searchButton}>
+          <Text style={styles.searchButtonText}>Buscar</Text>
+        </Pressable>
+
+        {/* Mensajes de estado */}
+        {isLoading && (
+          <Text style={styles.loadingText}>Cargando resultados...</Text>
+        )}
+        {error && <Text style={styles.errorText}>{error}</Text>}
+        <ScrollView>
+          <View style={styles.containerResult}>
+            {results.map((item, index) => (
+              <Pressable key={index} onPress={() => handlePress(item)}>
+                <View style={styles.cardContainer}>
+                  {item.imageUrl ? (
+                    <Image
+                      style={styles.image}
+                      source={{ uri: item.imageUrl }}
+                      resizeMode="contain"
+                    />
+                  ) : (
+                    <Text style={styles.noImageText}>Sin imagen</Text>
+                  )}
+                  <Text
+                    style={styles.name}
+                    numberOfLines={2}
+                    ellipsizeMode="tail"
+                  >
+                    {item.name}
+                  </Text>
+                </View>
+              </Pressable>
+            ))}
           </View>
-        </View>
+        </ScrollView>
+      </View>
 
-        <View style={styles.statsContainer}>
-          <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitleStats}>Tus Estadísticas</Text>
-            <Image source={require('../../../assets/images/Trophie.png')} style={styles.sectionIcon} />
+      <View style={styles.photoSearchContainer}>
+       
+          <Text style={styles.secondTitle}>Búsqueda por imagen</Text>
+          <View style={[styles.purple]}>
+             <Pressable onPress={() => handleCamera()}>
+            <Image
+              source={require("../../../assets/images/Camera.png")}
+              style={{ width: 80, height: 80, marginTop: 10 }}
+            />
+               </Pressable>
           </View>
-
-          <Text style={styles.statLabel}>Puntaje Total</Text>
-          <Text style={styles.statValue}>{stats[0]}</Text>
-
-          <Text style={styles.statLabel}>Trivias Jugadas</Text>
-          <Text style={styles.statValue}>{stats[1]}</Text>
-
-          <Text style={styles.statLabel}>Ranking Actual</Text>
-          <Text style={styles.statValue}>{stats[2]}</Text>
-        </View>
-
-        <View style={styles.sagasContainer}>
-          <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitleSagas}>Sagas Favoritas</Text>
-            <Image source={require('../../../assets/images/Badge.png')} style={styles.sectionIcon} />
-          </View>
-
-          {fandoms.length === 0 ? (
-            <Text style={styles.sagasText}>Aquí irán tus sagas favoritas... 👀</Text>
-          ) : (
-            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-              <View style={styles.containerResult}>
-                {fandoms.map((item, index) => (
-                  <Pressable key={index} onPress={() => handlePress(item)}>
-                    <View style={styles.cardContainer}>
-                      {item.url ? (
-                        <Image
-                          style={styles.image}
-                          source={{ uri: item.url }}
-                          resizeMode="contain"
-                        />
-                      ) : (
-                        <Text style={styles.noImageText}>Sin imagen</Text>
-                      )}
-                      <Text
-                        style={styles.name}
-                        numberOfLines={2}
-                        ellipsizeMode="tail"
-                      >
-                        {item.name}
-                      </Text>
-                    </View>
-                  </Pressable>
-                ))}
-              </View>
-            </ScrollView>
-          )}
-        </View>
-      </ScrollView>
+     
+      </View>
     </View>
   );
 }
@@ -130,120 +137,140 @@ setFandoms(fandomsArray);
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#111721',
-  },
-  scrollContent: {
-    flexGrow: 1,
-    alignItems: 'center',
+    backgroundColor: colors.blueDark,
+    paddingHorizontal: 24,
     paddingTop: 40,
-    paddingBottom: 40,
-    paddingHorizontal: 20,
-    gap: 25,
+    alignItems: "center",
   },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: 40,
-    paddingHorizontal: 20,
-    width: '100%',
-  },
-  menuButton: {
-    paddingVertical: 10,
-    paddingRight: 15,
-  },
-  menuIcon: {
-    fontSize: 22,
-    color: colors.white,
-  },
-  titleRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 15,
+  titleContainer: {
+    flexDirection: "row", // 🔹 ordena hijos horizontalmente
+    justifyContent: "flex-start", // opcional: distribuye el espacio
+    alignItems: "center", // opcional: alinea verticalmente
+    marginVertical: 20,
   },
   title: {
-    fontFamily: fonts.pressStart2P,
-    fontSize: 20,
+    fontFamily: "PressStart2P-Regular",
     color: colors.white,
-    textAlign: 'center',
+    textAlign: "center",
+    fontSize: 24,
+    width:"70%"
   },
-  userIcon: {
-    width: 45,
-    height: 45,
-    resizeMode: 'contain',
-  },
-  statsContainer: {
-    backgroundColor: colors.grayDark,
-    padding: 25,
-    width: '100%',
-    gap: 18,
-  },
-  statLabel: {
-    fontFamily: fonts.pressStart2P,
+containerTitle: {
+  width: "100%",
+  flexDirection: "row",
+  alignItems: "center",
+  justifyContent: "center", // centramos el contenido horizontalmente
+  position: "relative", // necesario para posicionar el botón back
+  marginVertical: 20,
+  paddingBottom: 5,
+},
+backButton: {
+  position: "absolute",
+  left: -50,
+  top: 0,
+},
+  containerContainer:{},
+  secondTitle: {
+    fontFamily: "PressStart2P-Regular",
     color: colors.orange,
-    fontSize: 13,
-  },
-  statValue: {
-    fontFamily: fonts.pressStart2P,
-    color: colors.white,
-    fontSize: 15,
-  },
-  sagasContainer: {
-    backgroundColor: colors.grayDark,
-    padding: 25,
-    width: '100%',
-  },
-  sagasText: {
-    fontFamily: fonts.pressStart2P,
-    color: '#D1D5DB',
-    fontSize: 13,
-    marginTop: 12,
-  },
-  sectionHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
+    textAlign: "center",
     marginBottom: 15,
   },
-  sectionTitleStats: {
-    fontFamily: fonts.pressStart2P,
-    color: '#6366F1',
-    fontSize: 16,
-  },
-  sectionTitleSagas: {
-    fontFamily: fonts.pressStart2P,
-    color: colors.pink,
-    fontSize: 16,
-  },
-  sectionIcon: {
-    width: 32,
-    height: 32,
-    resizeMode: 'contain',
-  },
-  containerResult: {
-    flexDirection: 'row',
-    gap: 20,
-  },
-  cardContainer: {
-    width: 120,
-    alignItems: 'center',
+  manualSearchContainer: {
     backgroundColor: colors.grayDark,
-    borderRadius: 10,
-    padding: 10,
+    paddingTop: 20,
+    width: "95%",
+    height: "55%",
+    alignItems: "center",
+    paddingBottom: 20,
+    marginBottom: 15,
   },
-  image: {
-    width: 90,
-    height: 120,
+  input: {
+    width: "75%",
+    fontFamily: "PressStart2P-Regular",
+    fontSize: 12,
+    backgroundColor: colors.white,
+    borderWidth: 1,
+    borderColor: colors.black,
+    color: colors.grayDark,
+    textAlign: "center",
+    padding: 10,
+    marginBottom: 10,
+  },
+  searchButton: {
+    backgroundColor: colors.orange,
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 0,
+    marginBottom: 10,
+  },
+  searchButtonText: {
+    fontFamily: "PressStart2P-Regular",
+    fontSize: 10,
+    color: colors.white,
+    textAlign: "center",
+  },
+  loadingText: {
+    color: colors.white,
+    fontFamily: "PressStart2P-Regular",
+    fontSize: 10,
+    marginBottom: 10,
+  },
+  errorText: {
+    color: "red",
+    fontFamily: "PressStart2P-Regular",
+    fontSize: 10,
     marginBottom: 10,
   },
   noImageText: {
-    color: colors.gray,
-    fontSize: 12,
+    color: colors.white,
+    fontSize: 10,
+    textAlign: "center",
+    marginTop: 40,
+  },
+  containerResult: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "space-between",
+    padding: 10,
+    width: "95%",
+    marginLeft: 8,
+  },
+  cardContainer: {
+    backgroundColor: colors.purple,
+    width: 125,
+    height: 149,
+    marginBottom: 20,
+    justifyContent: "center",
+  },
+  image: {
+    width: 100,
+    height: 100,
+    resizeMode: "cover",
+    alignSelf: "center",
+    marginTop: 10,
   },
   name: {
-    fontFamily: fonts.pressStart2P,
+    fontFamily: "PressStart2P-Regular",
     fontSize: 10,
     color: colors.white,
-    textAlign: 'center',
+    alignSelf: "center",
+    marginTop: 5,
+    textAlign: "center",
   },
+  photoSearchContainer: {
+    backgroundColor: colors.grayDark,
+    paddingTop: 10,
+    width: "50%",
+    alignItems: "center",
+    paddingBottom: 20,
+    marginBottom: 30,
+  },
+  purple: {
+    width: 100,
+    height: 100,
+    backgroundColor: colors.purple,
+    alignItems: "center",
+  },
+  button: {},
 });

@@ -80,4 +80,31 @@ backIcon: {
   marginRight: 30, // opcional: para separar el ícono del texto
   //tintColor: '#FFFFFF', // opcional: para colorear el ícono blanco si es SVG convertido a PNG negro
 },
+trashIcon: {  
+  width: 30,
+  height: 30,
+  marginRight: 10, // opcional: para separar el ícono del texto
+},
+trashButton: {
+  backgroundColor: colors.pink,
+  borderWidth: 5,
+  borderColor: colors.white,
+  paddingVertical: 2,
+  paddingHorizontal: 6,
+  width: 300,
+  height: 50,
+},
+trashButtonText: {
+  fontFamily: fonts.pressStart2P,
+  color: colors.white,
+  fontSize: 16,
+  textAlign: 'left',
+},
+trashContent: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  width: 287,
+  height: 40,
+  gap: 35, // si te tira error en versiones antiguas, usá marginRight en el ícono
+},
 });

@@ -66,14 +66,6 @@ export default function GameScreen() {
     }, [])
   );
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 15000); // 5 segundos
-
-    return () => clearTimeout(timer);
-  }, []);
-
   const { userName, getPlayersFromLobby } = lobbyContext;
 
   const { id, p } = useLocalSearchParams();
@@ -114,7 +106,17 @@ export default function GameScreen() {
     const result = await getResponse(
       "segun estos juegos:" +
         juegosEnTexto +
-        " dame 5 preguntas dificiles con 4 respuesta(diferenciadas A, B, C , D) y la unica respuesta corecta, como respuesta correcta dame la letra . devuelveme solo un json con clave pregunta y respuestas "
+        " dame 5 preguntas dificiles con 4 respuesta(diferenciadas A, B, C , D) y la unica respuesta corecta, como respuesta correcta dame la letra. devuelveme solo un json con el siguiente formato " +
+        '[{\
+        "pregunta": "...",\
+        "respuestas": {\
+          "A": "...",\
+          "B": "...",\
+          "C": "...",\
+          "D": "..."\
+        },\
+        "respuesta_correcta": "A"\
+      }]'
     );
     console.log("Respuesta de getResponse:", result);
     const cleanResult = result
@@ -123,12 +125,12 @@ export default function GameScreen() {
       .trim();
 
     try {
-      const parsed: Pregunta[] = JSON.parse(cleanResult);
+      const parsed = JSON.parse(cleanResult);
       setPreguntas(parsed);
       setPreguntaActualIndex(0); // Reinicia la pregunta actual al cargar nuevas
       setAnswerColors({});
       setTimer(30);
-      
+      setIsLoading(false);
     } catch (e) {
       console.error("Error al parsear JSON:", e);
     }
@@ -202,8 +204,8 @@ export default function GameScreen() {
                 params: {
                   pointSended: points,
                   preSended: correctAnswer,
-                  p: "3", 
-                  userName// Keep p=3 for consistency
+                  p: "3",
+                  userName, // Keep p=3 for consistency
                 },
               });
             } else if (p === "1") {
@@ -315,10 +317,9 @@ export default function GameScreen() {
         return;
       }
 
-      
       router.replace({
         pathname: "/Results2",
-        params: { id: typeof id === "string" ? id : "" , p},
+        params: { id: typeof id === "string" ? id : "", p },
       });
     } catch (error) {
       console.error("Error in updateDoc:", error);
@@ -345,67 +346,91 @@ export default function GameScreen() {
   }
 
   return (
-    <View style={styles.container}>
-      <View style={styles.nameContainer}>
-        <View style={styles.name}>
-          <Text style={styles.text}>{p1}</Text>
-        </View>
+<View style={styles.container}>
+  <View style={styles.nameContainer}>
+    <View style={styles.name}>
+      <Text style={styles.text}>{p1}</Text>
+    </View>
 
-        {p2 && (
-          <View style={styles.name}>
-            <Text style={styles.text}>{p2}</Text>
-          </View>
-        )}
+    {p2 && (
+      <View style={styles.name}>
+        <Text style={styles.text}>{p2}</Text>
       </View>
-      <View style={styles.utilContainer}>
-        <Text style={styles.text}> Pregunta {preguntaActualIndex + 1}/5 </Text>
-        <Image
-          source={require("../../../assets/images/Timer.png")}
-          style={{
-            width: 30,
-            height: 30,
-            marginBottom: 20,
-            marginLeft: 35,
-            tintColor: colors.white,
-          }}
-        />
+    )}
+  </View>
 
-        <Text style={styles.timerText}> {timer} </Text>
-      </View>
+  <View style={styles.utilContainer}>
+    <Text style={styles.text}> Pregunta {preguntaActualIndex + 1}/5 </Text>
+    <Image
+      source={require("../../../assets/images/Timer.png")}
+      style={{
+        width: 30,
+        height: 30,
+        marginBottom: 20,
+        marginLeft: 35,
+        tintColor: colors.white,
+      }}
+    />
+    <Text style={styles.timerText}> {timer} </Text>
+  </View>
 
-      {preguntas.length > 0 && preguntas[preguntaActualIndex] && (
-        <>
+  {preguntas.length > 0 && preguntas[preguntaActualIndex] && (
+    <>
+      {/* Determina el tamaño de fuente para la pregunta */}
+      {(() => {
+        const textoPregunta = preguntas[preguntaActualIndex].pregunta;
+        const fontSizePregunta =
+          textoPregunta.length > 120
+            ? 10
+            : textoPregunta.length > 80
+            ? 12
+            : 15;
+
+        return (
           <View style={styles.questionContainer}>
-            <Text style={styles.Question}>
-              {preguntas[preguntaActualIndex].pregunta}
+            <Text style={[styles.Question, { fontSize: fontSizePregunta }]}>
+              {textoPregunta}
             </Text>
           </View>
+        );
+      })()}
 
-          {(["A", "B", "C", "D"] as ("A" | "B" | "C" | "D")[]).map((key) => (
-            <Pressable
-              key={key}
-              onPress={() => cambiarColorDeRespuesta(key)}
-              disabled={
-                !!Object.values(answerColors).find(
-                  (color) => color === "green" || color === "red"
-                )
-              }
+      {/* Renderiza las respuestas con fuente adaptativa */}
+      {(["A", "B", "C", "D"] as ("A" | "B" | "C" | "D")[]).map((key) => {
+        const textoRespuesta = preguntas[preguntaActualIndex].respuestas[key];
+        const fontSizeRespuesta =
+          textoRespuesta.length > 60
+            ? 10
+            : textoRespuesta.length > 40
+            ? 12
+            : 16;
+
+        return (
+          <Pressable
+            key={key}
+            onPress={() => cambiarColorDeRespuesta(key)}
+            disabled={
+              !!Object.values(answerColors).find(
+                (color) => color === "green" || color === "red"
+              )
+            }
+          >
+            <View
+              style={[
+                styles.answerContainer,
+                { backgroundColor: answerColors[key] || colors.grayDark },
+              ]}
             >
-              <View
-                style={[
-                  styles.answerContainer,
-                  { backgroundColor: answerColors[key] || colors.grayDark },
-                ]}
-              >
-                <Text style={styles.text}>
-                  {preguntas[preguntaActualIndex].respuestas[key]}
-                </Text>
-              </View>
-            </Pressable>
-          ))}
-        </>
-      )}
-    </View>
+              <Text style={[styles.text, { fontSize: fontSizeRespuesta }]}>
+                {textoRespuesta}
+              </Text>
+            </View>
+          </Pressable>
+        );
+      })}
+    </>
+  )}
+</View>
   );
 }
 

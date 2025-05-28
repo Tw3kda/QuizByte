@@ -61,7 +61,7 @@ import { AuthContext } from '../../contexts/AuthContext'; // Ajusta el path si e
           onPress={handleSignUp}
         />
 
-        <TouchableOpacity onPress={() => router.push('/(auth)/LogIn')}>
+        <TouchableOpacity onPress={() => router.replace('/(auth)/LogIn')}>
           <Text style={styles.link}>¿Ya tienes una cuenta? Inicia sesión</Text>
         </TouchableOpacity>
       </View>

@@ -1,108 +1,85 @@
-import BackButton from '@/components/backButton';
-import TextInputComponent from '@/components/textInput';
-import colors from '@/constants/Colors';
-import { DrawerNavigationProp } from '@react-navigation/drawer';
-import { useNavigation } from '@react-navigation/native';
-import { useRouter } from 'expo-router';
-import { getAuth } from 'firebase/auth';
-import { doc, getDoc, getFirestore } from 'firebase/firestore';
-import React, { useEffect, useState } from 'react';
+// 📦 Imports
+import React from 'react';
 import { Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
-import fonts from '../../../constants/fonts';
+
+// 🧩 Components
+import BackButton from '@/components/backButton';
+import FriendCard from '@/components/friendCard';
+import TextInputComponent from '@/components/textInput';
+
+// 🎨 Estilos y Constantes
+import colors from '@/constants/Colors';
+import fonts from '@/constants/fonts';
 
 export default function Amigos() {
-  const [userName, setUserName] = useState('Cargando...');
-  const [searchText, setSearchText] = useState('');
-  const router = useRouter();
-  const navigation = useNavigation<DrawerNavigationProp<{}>>();
-
-  useEffect(() => {
-    const fetchUserName = async () => {
-      try {
-        const auth = getAuth();
-        const user = auth.currentUser;
-        if (!user) return;
-
-        const firestore = getFirestore();
-        const userRef = doc(firestore, 'users', user.uid);
-        const userSnap = await getDoc(userRef);
-
-        if (userSnap.exists()) {
-          const userData = userSnap.data();
-          setUserName(userData.name || 'Jugador');
-        } else {
-          setUserName('Jugador');
-        }
-      } catch (error) {
-        console.error('Error obteniendo el nombre:', error);
-        setUserName('Jugador');
-      }
-    };
-
-    fetchUserName();
-  }, []);
-
   return (
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
-        {/* Encabezado */}
+        {/* 🔝 Header */}
         <View style={styles.header}>
-          <Pressable onPress={() => navigation.openDrawer()} style={styles.menuButton}>
+          <Pressable style={styles.menuButton}>
             <Text style={styles.menuIcon}>☰</Text>
           </Pressable>
-          <View style={styles.titleContainer}> {/* Nuevo contenedor para el título */}
+          <View style={styles.titleContainer}>
             <Text style={styles.title}>Amigos</Text>
           </View>
-          <View style={styles.userIconContainer}> {/* Nuevo contenedor para el icono */}
+          <View style={styles.userIconContainer}>
             <Image source={require('../../../assets/images/User.png')} style={styles.userIcon} />
           </View>
         </View>
 
+        {/* 🔎 Buscar amigo */}
         <View style={styles.AddFriendRow}>
-          <Pressable onPress={() => console.log('Buscando amigos...')} style={styles.menuButton}>
-            <Image
-              source={require('../../../assets/images/Loupe.png')}
-              style={{ width: 25, height: 25, resizeMode: 'contain' }}
-            />
+          <Pressable style={styles.menuButton}>
+            <Image source={require('../../../assets/images/Loupe.png')} style={styles.icon} />
           </Pressable>
 
           <TextInputComponent
             placeholder="Ingrese nombre"
-            value={searchText}
-            onChangeText={setSearchText}
+            value="Ejemplo"
+            onChangeText={() => {}}
             color={colors.white}
-            textColor={"7C6E6E"}
+            textColor={colors.black}
             textAlign="center"
             width={235}
             height={40}
             containerStyle={{ marginBottom: 0 }}
           />
 
-          <Pressable onPress={() => console.log('Añadiste un nuevo amigo')} style={styles.menuButton}>
-            <Image
-              source={require('../../../assets/images/Add.png')}
-              style={{ width: 25, height: 25, resizeMode: 'contain' }}
-            />
+          <Pressable style={styles.menuButton}>
+            <Image source={require('../../../assets/images/Add.png')} style={styles.icon} />
           </Pressable>
         </View>
-        {/* Aquí vendría el dropdown personalizado después */}
 
-        {/* Aquí iría la lista de amigos, que sera renderizada dependiendo de la cantidad de amigos que tenga el usuario iniciado */}
-        {/* FriendCardComponent */}
-        {/* Aquí iría la lista de solicitudes de amistad */}
-        {/* FriendRequestCardComponent */}
+        {/* 👤 Resultado fijo */}
+        <FriendCard
+          id="1"
+          name="Juan Pérez"
+          score={1234}
+          onInvite={() => {}}
+          onDelete={() => {}}
+          actionLabel="Enviar solicitud"
+        />
 
-        {/* Botón de regresar */}
-        <BackButton onPress={() => router.back()} />
+        {/* ✉️ Solicitudes */}
+        <View style={styles.RequestsRow}>
+          <Image source={require('../../../assets/images/Mailbox.png')} style={styles.userIcon} />
+          <Text style={styles.title}>Solicitudes</Text>
+        </View>
+
+        {/* ⬅️ Volver */}
+        <BackButton onPress={() => {}} />
       </ScrollView>
     </View>
   );
 }
 
+// 🎨 Estilos
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.blueDark,
+    paddingTop: 35,
   },
   scrollContent: {
     flexGrow: 1,
@@ -115,7 +92,7 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between', // Mantenemos space-between
+    justifyContent: 'space-between',
     marginBottom: 20,
     paddingHorizontal: 20,
     width: '100%',
@@ -129,11 +106,9 @@ const styles = StyleSheet.create({
     fontSize: 24,
     color: colors.white,
   },
-  titleRow: {
-    flexDirection: 'row',
+  titleContainer: {
+    flex: 1,
     alignItems: 'center',
-    gap: 10,
-    marginLeft: 'auto', // Empuja el bloque a la derecha
   },
   title: {
     fontFamily: fonts.pressStart2P,
@@ -141,25 +116,34 @@ const styles = StyleSheet.create({
     color: colors.white,
     textAlign: 'center',
   },
-  titleContainer: { 
-    flex: 1,
-    alignItems: 'center', // Centramos el título dentro de su contenedor
+  userIconContainer: {
+    alignItems: 'center',
   },
   userIcon: {
     width: 35,
     height: 35,
     resizeMode: 'contain',
   },
-  userIconContainer: {
-    alignItems: 'center',
-  },
   AddFriendRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     marginBottom: 30,
-    paddingHorizontal: 20,
     width: '100%',
     gap: 10,
+    paddingRight: 20,
+  },
+  RequestsRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 20,
+    paddingHorizontal: 20,
+    width: '100%',
+  },
+  icon: {
+    width: 25,
+    height: 25,
+    resizeMode: 'contain',
   },
 });

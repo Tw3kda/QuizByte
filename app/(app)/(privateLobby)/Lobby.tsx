@@ -102,7 +102,7 @@ export default function Lobby() {
           onPress={() => {
             if (lobbyId) {
               router.push({
-                pathname: "/(app)/(privateLobby)/QR",
+                pathname: "/(app)/(privateLobby)/Qr",
                 params: { id: lobbyId },
               });
             }

@@ -127,6 +127,8 @@ export default function CameraScreen({ navigation }: any) {
 
       console.log(game);
 
+          setIsLoading(false); // Finaliza la carga
+
       router.push({
         pathname: "/confirm",
         params: {

@@ -57,6 +57,7 @@ export default function SearchScreen() {
     const cleanUrl = String(url).trim();
     setCleanUrl(cleanUrl);
     console.log("Attempting to load image:", cleanUrl);
+      
     Image.getSize(
       cleanUrl,
       (width, height) => {
@@ -66,13 +67,17 @@ export default function SearchScreen() {
           width: width * scale,
           height: height * scale,
         });
+
         console.log("Image size:", { width, height, scaledWidth: width * scale, scaledHeight: height * scale });
-        setIsLoading(false);
+              setIsLoading(false);
+
       },
       (error) => {
+             setIsLoading(false);
+
         console.error("Error fetching image size:", error);
         setImageSize({ width: 250, height: 250 });
-        setIsLoading(false);
+     
       }
     );
   }
