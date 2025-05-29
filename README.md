@@ -1,3 +1,5 @@
+# Hecho por: SANTIAGO NAVARRO CUY & NICOLAS MUÑOS
+
 # QuizByte – Trivias personalizadas de videojuegos con IA
 
 **QuizByte** es una aplicación móvil que genera **preguntas personalizadas sobre videojuegos** usando inteligencia artificial. Los usuarios pueden construir su propia biblioteca de juegos, y la IA generará trivias adaptadas a los títulos que han jugado. Además, puedes competir con otros jugadores en tiempo real y demostrar quién sabe más.
