@@ -1,50 +1,49 @@
-# Welcome to your Expo app 👋
+# QuizByte – Trivias personalizadas de videojuegos con IA
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+**QuizByte** es una aplicación móvil que genera **preguntas personalizadas sobre videojuegos** usando inteligencia artificial. Los usuarios pueden construir su propia biblioteca de juegos, y la IA generará trivias adaptadas a los títulos que han jugado. Además, puedes competir con otros jugadores en tiempo real y demostrar quién sabe más.
 
-## Get started
+---
 
-1. Install dependencies
+## Funcionalidades principales
 
-   ```bash
-   npm install
-   ```
+- Generación de preguntas con IA según tus juegos favoritos
+- Biblioteca personalizada de videojuegos
+- Modo competitivo de 2 jugadores con puntuación en tiempo real
+- Búsqueda de juegos e imágenes usando la base de datos de [IGDB](https://www.igdb.com/)
+- Carga de fotos desde cámara (API de Gemini)
+- Autenticación y registros con Firebase
+- Lobbies privados mediante QR con `react-native-qrcode-svg`
 
-2. Start the app
+---
 
-   ```bash
-   npx expo start
-   ```
+## Tecnologías utilizadas
 
-In the output, you'll find options to open the app in a
+- **React Native** con **Expo Go**
+- `react-native-qrcode-svg` – para generar códigos QR
+- `expo-camera` – para capturar imágenes desde la cámara del dispositivo
+- **Firebase** – para autenticación y almacenamiento de datos de los jugadores
+- **Gemini API** – para generación de contenido a partir de imágenes
+- **IGDB API** – para obtener información e imágenes de videojuegos
+- **Backend API** – lógica de busqueda de juegos por texto o imagenes usando gemini API e IGDB API
+  *(ver más abajo)*
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+---
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
+## Instalación y ejecución
 
 ```bash
-npm run reset-project
+git clone https://github.com/Tw3kda/QuizByte.git
+cd QuizByte
+npm install
+npx expo start
+
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
 
-## Learn more
+## API backend
 
-To learn more about developing your project with Expo, look at the following resources:
+La lógica para conectarse a IGDB Y GEMINI para agregar videojuegos está manejada a través de una API desarrollada para este proyecto.
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+[Enlace al github de la API](https://github.com/Tw3kda/QuizByte_API.git)
 
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+Consulta más detalles en el README y Wiki de ese repositorio.
