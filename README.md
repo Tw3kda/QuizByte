@@ -16,7 +16,7 @@
 
 ---
 
-**Sobre el Funcionamiento para el usuario consultar la wiki**
+##**Sobre el Funcionamiento para el usuario consultar la wiki**
 
 ## Tecnologías utilizadas
 
