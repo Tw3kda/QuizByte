@@ -10,9 +10,9 @@
 - Biblioteca personalizada de videojuegos
 - Modo competitivo de 2 jugadores con puntuación en tiempo real
 - Búsqueda de juegos e imágenes usando la base de datos de [IGDB](https://www.igdb.com/)
-- Carga de fotos desde cámara (API de Gemini)
+- Carga de fotos desde cámara  para analisis por IA (API de Gemini)
 - Autenticación y registros con Firebase
-- Lobbies privados mediante QR con `react-native-qrcode-svg`
+- Lobbies privados mediante IDs unicos, compartibles por medio de  QR con `react-native-qrcode-svg`
 
 ---
 
