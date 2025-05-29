@@ -16,6 +16,8 @@
 
 ---
 
+**Sobre el Funcionamiento para el usuario consultar la wiki**
+
 ## Tecnologías utilizadas
 
 - **React Native** con **Expo Go**
