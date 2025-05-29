@@ -25,6 +25,7 @@
 - **React Native** con **Expo Go**
 - `react-native-qrcode-svg` – para generar códigos QR
 - `expo-camera` – para capturar imágenes desde la cámara del dispositivo
+- `expo-clipboard` para copiar el codigo de invitacion 
 - **Firebase** – para autenticación y almacenamiento de datos de los jugadores
 - **Gemini API** – para generación de contenido a partir de imágenes
 - **IGDB API** – para obtener información e imágenes de videojuegos
